@@ -24,7 +24,7 @@ DEC  <- seq(from = 12, to = TMAX, by = 12);
 #     This should probably be only run after movement has happened and new nests
 #     are built so that offspring are not removed before reproductively active
 #     This function is quite slow -- probably want to speed it up somehow
-cell_K <- function(res, DIM_1 = 500, DIM_2 = 500){
+cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
   for(i in 1:DIM_1){
     for(j in 1:DIM_2){
       sum_ij <- sum(res[, 5] == i & res[, 6] == j)
