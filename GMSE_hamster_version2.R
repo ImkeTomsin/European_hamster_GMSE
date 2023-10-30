@@ -99,11 +99,11 @@ crop_hamster <- function(land, res){
 #===============================================================================
 
 
-DIM_1 <- 500; # Land dimension 1
-DIM_2 <- 500; # Land dimension 2
+DIM_1 <- 447; # Land dimension 1
+DIM_2 <- 447; # Land dimension 2
 # BD: Initialise the first output
 sim_old   <- gmse_apply(res_movement    = 0, 
-                        remove_pr       = 1 - 0.966, 
+                        remove_pr       = 1 - 0.976083968, 
                         lambda          = 0, 
                         res_death_type  = 1,
                         observe_type    = 2, #but only happens once a year
@@ -135,44 +135,44 @@ for(time_step in 1:TMAX){
   next_time               <- time_step + 1; # What happens next time step?
   if(next_time %in% JAN){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.966; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% FEB){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.960; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.94824969; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% MAR){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.919; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.9023544; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% APR){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.953; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% MAY){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.859; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUN){
     sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.827; # Death probability
-    sim_new[["resource_array"]][, 10] <- 3;         # Birth probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUL){
     sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.839; # Death probability
-    sim_new[["resource_array"]][, 10] <- 3;         # Birth probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -184,7 +184,7 @@ for(time_step in 1:TMAX){
   }
   if(next_time %in% AUG){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.838; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     old_obs                           <- sim_new[["observation_array"]];
     temp_res                          <- sim_new[["resource_array"]];
@@ -193,26 +193,26 @@ for(time_step in 1:TMAX){
   }
   if(next_time %in% SEP){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.910; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     
   }
   if(next_time %in% OCT){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.897; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.891729601; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% NOV){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.923; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.939895976; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% DEC){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
-    sim_new[["resource_array"]][, 9]  <- 1 - 0.897; # Death probability
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.956833861; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
