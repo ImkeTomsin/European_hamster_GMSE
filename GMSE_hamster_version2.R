@@ -1,8 +1,5 @@
 library(GMSE); # Note that the semi-colons are not really necessary
 
-
-# Scenario 1: no hamster-friendly management
-
 #===============================================================================
 # BD: Let's simplify by defining the different months explicitly in the code
 TMAX <- 24; # Maximum number of months in the simulation;
@@ -56,13 +53,13 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 #     See below that the function is run before looping over time.
 
 
-#Imke: I changed the crop type function so it now assigns a random crop type to each farm
+#Imke: I changed the crop type function so it now assigns a random crop type to each farm at the start of the simulations
 
 crop_type <- function(land){
   xdim <- dim(land)[1];
   ydim <- dim(land)[2];
-  for(i in 1:xdim){
-    for(j in 1:ydim){
+  for(i in 1:xdim){   
+  for(j in 1:ydim){
         if (land[i, j, 3] %in% 1:4) {  #1:number of farms/stakeholders 
           land[i, j, 1] <- sample(1:3, 1) #1:number of possible crop types 
       }
@@ -85,33 +82,48 @@ crop_type <- function(land){
 
 crop_hamster_1 <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
-    for(i in 1:N){
+    for(i in 1:N) { 
         xloc <- res[i, 5];
         yloc <- res[i, 6];
         crop <- land[xloc, yloc, 1];
-        if(crop == 1){ # 100% mortality 
-            res[i, 9] <- 1; 
-        }
-        if(crop == 2){  # Increase mortality by 10%
-            res[i, 9] <- res[i,9] + 0.10;
-        }
+        
+        cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n")
+        
+          if (crop == 1) {
+          res[i, 9] <- 1  # 100% mortality
+        } else if (crop == 2) {
+          res[i, 9] <- res[i, 9] + 0.10  # Increase mortality by 10%
+        } else {
+          #default case, nothing changes
+      }
     }
     return(res);
 }
 
-#changes in birth rate only happen in certain months, so this function is just for that
 
-crop_hamster_2 <- function(land, res){     #Imke: changed parameters to simulate crop types 1-3
-  N <- dim(res)[1]; # Number of hamsters
-  for(i in 1:N){
-    xloc <- res[i, 5];
-    yloc <- res[i, 6];
-    crop <- land[xloc, yloc, 1];
-    if(crop == 3){  # Set birthrate to 1.18 (extra litter)
-      res[i, 10] <- 1.18;
+
+#changes in birth rate only happen in certain months, this function is designed for those months: 
+
+crop_hamster_2 <- function(land, res) {
+  N <- dim(res)[1]  # Number of hamsters
+  for (i in 1:N) {   
+    xloc <- res[i, 5]
+    yloc <- res[i, 6]
+    crop <- land[xloc, yloc, 1]
+    
+    cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n")
+  
+    if (crop == 1) {
+      res[i, 9] <- 1  # 100% mortality 
+    } else if (crop == 2) {
+      res[i, 9] <- res[i, 9] + 0.10  # Increase mortality by 10%
+    } else if (crop == 3) {
+      res[i, 10] <- 1.18  # Set birthrate to 1.18 (extra litter)
+    } else {
+      #default
     }
   }
-  return(res);
+  return(res)
 }
 
 #===============================================================================
@@ -121,14 +133,15 @@ crop_hamster_2 <- function(land, res){     #Imke: changed parameters to simulate
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 # BD: Initialise the first output
-sim_old   <- gmse_apply(res_movement    = 0, 
+sim_old   <- gmse_apply(stakeholders    = 4,
+                        res_movement    = 0, 
                         remove_pr       = 1 - 0.976083968, 
                         lambda          = 0, 
                         res_death_type  = 1,
                         observe_type    = 2, #but only happens once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 200, 
+                        RESOURCE_ini    = 50, 
                         culling         = FALSE,
                         land_ownership  = TRUE,
                         age_repr        = 1,
@@ -242,9 +255,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
-                                                        res  = temp_res);
-    sim_new[["resource_array"]]       <- crop_hamster_2(land = temp_land,  #applying both functions for changing parameters based on crop types, is this correct? 
+    sim_new[["resource_array"]]       <- crop_hamster_2(land = temp_land,  #function 2 because birth rate changes for type 3
                                                         res  = temp_res)
   }
   if(next_time %in% SEP){
