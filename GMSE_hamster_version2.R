@@ -1,5 +1,8 @@
 library(GMSE); # Note that the semi-colons are not really necessary
 
+
+# Scenario 1: no hamster-friendly management
+
 #===============================================================================
 # BD: Let's simplify by defining the different months explicitly in the code
 TMAX <- 24; # Maximum number of months in the simulation;
@@ -51,27 +54,22 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 #     function below puts crop type 1 for farms 1 and 3, and crop type 2 for 
 #     farms 2 and 4. You can add more farms and crops with more `if` statements.
 #     See below that the function is run before looping over time.
+
+
+#Imke: I changed the crop type function so it now assigns a random crop type to each farm
+
 crop_type <- function(land){
-    xdim <- dim(land)[1];
-    ydim <- dim(land)[2];
-    for(i in 1:xdim){
-        for(j in 1:ydim){
-            if(land[i, j, 3] == 1){
-                land[i, j, 1] <- 1;
-            }
-            if(land[i, j, 3] == 2){
-                land[i, j, 1] <- 2;
-            }
-            if(land[i, j, 3] == 3){
-                land[i, j, 1] <- 1;
-            }
-            if(land[i, j, 3] == 4){
-                land[i, j, 1] <- 2;
-            }
-        }
+  xdim <- dim(land)[1];
+  ydim <- dim(land)[2];
+  for(i in 1:xdim){
+    for(j in 1:ydim){
+        if (land[i, j, 3] %in% 1:4) {  #1:number of farms/stakeholders 
+          land[i, j, 1] <- sample(1:3, 1) #1:number of possible crop types 
+      }
     }
+  } 
     return(land);
-}
+} 
 #===============================================================================
 
 #===============================================================================
@@ -81,23 +79,44 @@ crop_type <- function(land){
 #     adjusts the birthrate (column 10) depending on the crop type. You can also
 #     edit other things, of course, like death probability (column 9). I show 
 #     how to use the function in the month of July below.
-crop_hamster <- function(land, res){
+
+#Imke: changed parameters to simulate crop types 1-3
+#I needed to make two functions, one to change parameters for types 1 and 2 in a monthly basis (e.g. no survival at all in type 1 fields)
+
+crop_hamster_1 <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
     for(i in 1:N){
         xloc <- res[i, 5];
         yloc <- res[i, 6];
         crop <- land[xloc, yloc, 1];
-        if(crop == 1){ # Increase birthrate by 1
-            res[i, 10] <- res[i, 10] + 1; 
+        if(crop == 1){ # 100% mortality 
+            res[i, 9] <- 1; 
         }
-        if(crop == 2){  # Set birthrate to zero
-            res[i, 10] <- 0;
+        if(crop == 2){  # Increase mortality by 10%
+            res[i, 9] <- res[i,9] + 0.10;
         }
     }
     return(res);
 }
-#===============================================================================
 
+#changes in birth rate only happen in certain months, so this function is just for that
+
+crop_hamster_2 <- function(land, res){     #Imke: changed parameters to simulate crop types 1-3
+  N <- dim(res)[1]; # Number of hamsters
+  for(i in 1:N){
+    xloc <- res[i, 5];
+    yloc <- res[i, 6];
+    crop <- land[xloc, yloc, 1];
+    if(crop == 3){  # Set birthrate to 1.18 (extra litter)
+      res[i, 10] <- 1.18;
+    }
+  }
+  return(res);
+}
+
+#===============================================================================
+#parameters specified here are for crop type 3, except the extra litter which is modelled by the function crop_hamster_2
+#for types 1 and 2, a different mortality is modelled each month (also look into no births in type 1 and different mortality in type 3)
 
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
@@ -109,7 +128,7 @@ sim_old   <- gmse_apply(res_movement    = 0,
                         observe_type    = 2, #but only happens once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 15, 
+                        RESOURCE_ini    = 200, 
                         culling         = FALSE,
                         land_ownership  = TRUE,
                         age_repr        = 1,
@@ -138,36 +157,66 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% FEB){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.94824969; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% MAR){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.9023544; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% APR){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% MAY){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% JUN){
     sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
     sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% JUL){
     sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
@@ -179,7 +228,7 @@ for(time_step in 1:TMAX){
                                                 DIM_2 = DIM_2);
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
                                                       res  = temp_res);
   }
   if(next_time %in% AUG){
@@ -190,6 +239,13 @@ for(time_step in 1:TMAX){
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
                                                 DIM_2 = DIM_2);
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
+    sim_new[["resource_array"]]       <- crop_hamster_2(land = temp_land,  #applying both functions for changing parameters based on crop types, is this correct? 
+                                                        res  = temp_res)
   }
   if(next_time %in% SEP){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
@@ -197,24 +253,47 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     
+
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
+  
   if(next_time %in% OCT){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.891729601; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
+    
+    
   }
   if(next_time %in% NOV){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.939895976; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   if(next_time %in% DEC){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.956833861; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    
+    temp_res                          <- sim_new[["resource_array"]];
+    temp_land                         <- sim_new[["LAND"]];
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+                                                        res  = temp_res);
   }
   sim_old <- sim_new; # BD: This should always go at the end
   
