@@ -87,9 +87,9 @@ No or very late harvest, with vegetation being a mix of hamster-friendly crops a
 To do: look into correct parameters to use (also look into no births in type 1 and different mortality in type 3). Look if two functions can be combined into one.
 
 ```{r}
-# The functions below check each hamster's cell location, then checks the crop type on that location, and adjusts population parameters accordingly
+# The function below checks each hamster's cell location, then checks the crop type on that location, and adjusts population parameters accordingly
 
-#The first function is designed for changing population parameters on a monthly basis, e.g. no survival at all in crop type 1
+#The function currently changes mortality for hamsters in crop types 1 and 2 on a monthly basis, and changes lambda for hamsters in crop type 3 in the month August (= extra litter)
 
 crop_hamster_1 <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
@@ -99,41 +99,18 @@ crop_hamster_1 <- function(land, res){
         crop <- land[xloc, yloc, 1];
         
         cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, probably has to be deleted later
-        
+      
           if (crop == 1) {
           res[i, 9] <- 1  # column 9 = death probability -> 100% mortality
         } else if (crop == 2) {
           res[i, 9] <- res[i, 9] + 0.10  # Increase mortality by 10% LOOK FOR RIGHT PARAMETER HERE 
+        } else if (crop == 3 && next_time %in% AUG) { #only for the month August
+          res[i, 10] <- 1.18
         } else {
           # Default case, nothing changes
       }
     }
     return(res);
-}
-
-
-# The second function can be used for parameters that have to change only in certain months; e.g. for modelling one extra litter 
-
-crop_hamster_2 <- function(land, res) {
-  N <- dim(res)[1]  # Number of hamsters
-  for (i in 1:N) {   
-    xloc <- res[i, 5]
-    yloc <- res[i, 6]
-    crop <- land[xloc, yloc, 1]
-    
-    cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n")
-  
-    if (crop == 1) {
-      res[i, 9] <- 1  # 100% mortality 
-    } else if (crop == 2) {
-      res[i, 9] <- res[i, 9] + 0.10  # Increase mortality by 10%
-    } else if (crop == 3) {
-      res[i, 10] <- 1.18  # column 10 = birthrate; Set birthrate to 1.18 (extra litter)
-    } else {
-      #default
-    }
-  }
-  return(res)
 }
 
 ```
@@ -143,7 +120,7 @@ crop_hamster_2 <- function(land, res) {
 ```{r}
 library(GMSE)
 
-#parameters specified below are for hamsters in crop type 3, except for the extra litter which is curenntly modelled by the function crop_hamster_2. ! For types 1 and 2, a different mortality is modelled each month. 
+#parameters specified below are for hamsters in crop type 3, except for the extra litter which is currently modelled by the function crop_hamster_2. ! For types 1 and 2, a different mortality is modelled each month. 
 
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
@@ -269,7 +246,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_2(land = temp_land,  #function 2 because birth rate changes for type 3
+    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land,  #function 2 because birth rate changes for type 3
                                                         res  = temp_res)
   }
   if(next_time %in% SEP){
