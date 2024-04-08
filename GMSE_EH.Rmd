@@ -84,8 +84,6 @@ Later harvests allow for an additional litter
 Not in here yet but I might want to add it, crop type 4: Hamster heaven. 
 No or very late harvest, with vegetation being a mix of hamster-friendly crops and herbs etc. leading to a higher lambda. 
 
-To do: look into correct parameters to use (also look into no births in type 1 and different mortality in type 3). Look if two functions can be combined into one.
-
 ```{r}
 # The function below checks each hamster's cell location, then checks the crop type on that location, and adjusts population parameters accordingly
 
@@ -120,7 +118,7 @@ crop_hamster_1 <- function(land, res){
 ```{r}
 library(GMSE)
 
-#parameters specified below are for hamsters in crop type 3, except for the extra litter which is currently modelled by the function crop_hamster_2. ! For types 1 and 2, a different mortality is modelled each month. 
+#parameters specified below are for hamsters in crop type 3. For types 1 and 2, a different mortality is modelled each month. 
 
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
