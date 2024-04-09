@@ -127,10 +127,11 @@ library(GMSE)
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 
-iterations <- 10 #number of iterations
+iterations <- 100 #number of iterations
 results <- list() #list to store results from each repetition
 
 for (rep in 1:iterations) {
+  tryCatch({
 
 # Initialise the first output
 sim_old   <- gmse_apply(stakeholders    = 1, 
@@ -141,7 +142,7 @@ sim_old   <- gmse_apply(stakeholders    = 1,
                         observe_type    = 2, # but only once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 25, # N 
+                        RESOURCE_ini    = 30, # N 
                         culling         = FALSE,
                         land_ownership  = TRUE,
                         age_repr        = 1,
@@ -241,8 +242,18 @@ for(time_step in 1:TMAX){
   }
   sim_old <- sim_new; # BD: This should always go at the end
   
-  print(sim_sum_1[time_step,]); # BD: Just to see the simulation progress
+  #print(sim_sum_1[time_step,]); # Activate to see the simulation progress
 }
+
+}, error = function(e) { #tryCatch: if error occurs because N = 0
+    cat("Error occurred in iteration", rep, ":", conditionMessage(e), "\n")
+    # If an error occurs (extinction), record Pop_size and Pop_est as 0
+    sim_sum_1 <- matrix(data = 0, nrow = TMAX, ncol = 3)
+    colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est")
+    sim_sum_1 <- cbind(rep, sim_sum_1)
+    results[[rep]] <- sim_sum_1
+
+}) #end of tryCatch
 
 colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
 sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
@@ -252,8 +263,9 @@ results[[rep]] <- sim_sum_1
 }
 
 combined_results <- do.call(rbind, results)
+combined_results[is.na(combined_results)] <- 0
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/try_out.csv"
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN30.csv"
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
