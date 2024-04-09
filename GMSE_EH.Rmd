@@ -56,7 +56,7 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 ```{r}
 # The 'land' in GMSE is a 3D array with the farm number in layer 3, the crop amount in layer 2, and nothing in layer 1. The code below redefines layer 1 by putting a crop type (1 or 2) down for each farm number (you can change these as desired).The code assigns a random crop type to the land owned by each stakeholder. The function has to be run before looping over time. 
 
-crop_type <- function(land, stakeholders = 5, types = 3){ # stakeholders: number of stakeholders/farms, types = number of possible crop types
+crop_type <- function(land, stakeholders = 100, types = 3){ # stakeholders: number of stakeholders/farms, types = number of possible crop types
   xdim <- dim(land)[1];
   ydim <- dim(land)[2];
   for(i in 1:xdim){   
@@ -92,8 +92,8 @@ No or very late harvest, with vegetation being a mix of hamster-friendly crops a
 crop_hamster_1 <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
     for(i in 1:N) { 
-        xloc <- res[i, 5];
-        yloc <- res[i, 6];
+        xloc <- res[i, 5] +1; #+1 to fix indexing difference problem between R and C 
+        yloc <- res[i, 6] +1;
         crop <- land[xloc, yloc, 1];
         
         cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, probably has to be deleted later
@@ -115,6 +115,152 @@ crop_hamster_1 <- function(land, res){
 
 # GMSE simulations 
 
+## 1: for different parameter sets/crop types 
+
+Allemaal startende van 250 individuen, aantal stakeholders onbelangrijk hier omdat er geen acties ondernomen worden.
+
+### crop type 3, 2 litters
+
+```{r}
+
+library(GMSE)
+DIM_1 <- 447; # Land dimension 1
+DIM_2 <- 447; # Land dimension 2
+
+iterations <- 10 #number of iterations
+results <- list() #list to store results from each repetition
+
+for (rep in 1:iterations) {
+
+# Initialise the first output
+sim_old   <- gmse_apply(stakeholders    = 1, 
+                        res_movement    = 0, 
+                        remove_pr       = 1 - 0.976083968, 
+                        lambda          = 0, 
+                        res_death_type  = 1,
+                        observe_type    = 2, # but only once a year
+                        res_move_obs    = FALSE, 
+                        max_ages        = 24, 
+                        RESOURCE_ini    = 25, # N 
+                        culling         = FALSE,
+                        land_ownership  = TRUE,
+                        age_repr        = 1,
+                        land_dim_1      = DIM_1,
+                        land_dim_2      = DIM_2,
+                        manage_target   = 2500,
+                        get_res         = 'Full');
+old_obs  <- sim_old[["observation_array"]];
+
+# Currently, 3 variables are recorded as output
+# Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
+sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
+for(time_step in 1:TMAX){
+  sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full');
+  sim_sum_1[time_step, 1] <- time_step;
+  sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
+  sim_sum_1[time_step, 3] <- sim_new$basic_output$observation_results[1];
+  next_time               <- time_step + 1; # What happens next time step?
+  if(next_time %in% JAN){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% FEB){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.94824969; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% MAR){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.9023544; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% APR){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% MAY){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% JUN){
+    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% JUL){
+    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
+  }
+  if(next_time %in% AUG){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
+  }
+  if(next_time %in% SEP){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  
+  if(next_time %in% OCT){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.891729601; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% NOV){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.939895976; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% DEC){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.956833861; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  sim_old <- sim_new; # BD: This should always go at the end
+  
+  print(sim_sum_1[time_step,]); # BD: Just to see the simulation progress
+}
+
+colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
+sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
+print(sim_sum_1); 
+results[[rep]] <- sim_sum_1
+
+}
+
+combined_results <- do.call(rbind, results)
+
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/try_out.csv"
+write.csv(combined_results, file = file_path, row.names = FALSE)
+
+```
+
+
+## 2: including multiple different crop types
+
 ```{r}
 library(GMSE)
 
@@ -124,7 +270,7 @@ DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 
 # Initialise the first output
-sim_old   <- gmse_apply(stakeholders    = 5, # should be the same as in function crop_type
+sim_old   <- gmse_apply(stakeholders    = 100, # should be the same as in function crop_type
                         res_movement    = 0, 
                         remove_pr       = 1 - 0.976083968, 
                         lambda          = 0, 
