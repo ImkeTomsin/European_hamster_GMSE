@@ -1,0 +1,29 @@
+---
+title: "GMSE_output_analysis"
+author: "Imke Tomsin"
+date: "2024-04-11"
+output: html_document
+---
+
+```{r}
+data <- read.csv("100iterations_type3.csv_startN15", header=TRUE,sep=",")
+str(data)
+
+library(ggplot2)
+
+
+# Assuming your data is stored in a data frame named 'df'
+
+# Plot all iterations as light grey lines
+ggplot(df, aes(x = Time, y = Pop_size, group = rep)) +
+  geom_line(color = "lightgrey") +
+  
+# Plot the mean as a dark/black line
+  stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", size = 1) +
+
+# Add labels and title
+  labs(x = "Time", y = "Population Size", title = "Population Size Over Time")
+
+```
+
+
