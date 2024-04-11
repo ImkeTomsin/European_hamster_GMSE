@@ -4,25 +4,88 @@ author: "Imke Tomsin"
 date: "2024-04-11"
 output: html_document
 ---
+# Load data to be analysed 
+```{r}
+data_1 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN15.csv", header=TRUE,sep=",")
+data_2 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN30.csv", header=TRUE,sep=",")
+data_3 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN250.csv", header=TRUE,sep=",")
+data_1b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN15.csv", header=TRUE,sep=",")
+data_2b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN30.csv", header=TRUE,sep=",")
+data_3b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN250.csv", header=TRUE,sep=",")
+
+```
+
+# Plot all simulations on one graph + their mean
 
 ```{r}
-data <- read.csv("100iterations_type3.csv_startN15", header=TRUE,sep=",")
-str(data)
-
 library(ggplot2)
+library(gridExtra)
+
+generate_plot <- function(data) {
+  ggplot(data, aes(x = Time, y = Pop_size, group = rep)) +
+    geom_line(color = "lightgrey") + #plot all iterations as grey lines 
+    stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", linewidth = 1) + #plot the mean as a dark/black line
+    labs(x = "Time", y = "Population Size", title = "Population Size Over Time") #add labels and titles
+} 
+
+plot_1<-generate_plot(data_1)
+plot_2<-generate_plot(data_2)
+plot_3<-generate_plot(data_3)
+
+# print(plot_1)
+
+grid.arrange(plot_1, plot_2, plot_3, nrow = 1)
+
+```
 
 
-# Assuming your data is stored in a data frame named 'df'
+# Show mean for population dynamics for each of 3 starting population sizes 
+```{r}
+# Calculate the mean population size for each analysis
+mean_pop1 <- aggregate(Pop_size ~ Time, data_1, mean)
+mean_pop2 <- aggregate(Pop_size ~ Time, data_2, mean)
+mean_pop3 <- aggregate(Pop_size ~ Time, data_3, mean)
 
-# Plot all iterations as light grey lines
-ggplot(df, aes(x = Time, y = Pop_size, group = rep)) +
-  geom_line(color = "lightgrey") +
+# Remove the row where Time == 0, if it exists; this is necessary because the above function randomly seems to incorporate a timestep 0 in the first two dataframes? 
+mean_pop1 <- mean_pop1[mean_pop1$Time != 0, ]
+mean_pop2 <- mean_pop2[mean_pop2$Time != 0, ]
+mean_pop3 <- mean_pop3[mean_pop3$Time != 0, ]
+
+# Combine the mean population sizes from all analyses into a single data frame
+combined_mean_pop <- rbind(mean_pop1, mean_pop2, mean_pop3)
+combined_mean_pop$Analysis <- rep(c("Analysis 1", "Analysis 2", "Analysis 3"), each = nrow(mean_pop1))
+
+# Plot the combined mean population sizes
+ggplot(combined_mean_pop, aes(x = Time, y = Pop_size, color = Analysis)) +
+  geom_line() +
+  labs(x = "Time", y = "Mean Population Size", title = "Mean Population Size Over Time")
+
+```
+
+# Calculate the probability of extinction
+```{r}
+# Determine the number of repetitions
+reps <- max(data_1b$rep)
+
+# Initialize a counter for extinction events
+extinction_count <- 0
+
+# Loop through each repetition
+for (i in 1:reps) {
+  # Subset data for the current repetition
+  rep_data <- subset(data_1b, rep == i)
   
-# Plot the mean as a dark/black line
-  stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", size = 1) +
+  # Check if the population size ever reaches zero
+  if (any(rep_data$Pop_size == 0)) {
+    extinction_count <- extinction_count + 1
+  }
+}
 
-# Add labels and title
-  labs(x = "Time", y = "Population Size", title = "Population Size Over Time")
+# Calculate the probability of extinction
+probability_extinction <- extinction_count / reps
+
+# Print the result
+print(paste("Probability of extinction:", probability_extinction))
 
 ```
 
