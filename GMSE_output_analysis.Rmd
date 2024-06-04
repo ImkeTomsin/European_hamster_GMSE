@@ -21,20 +21,27 @@ data_3b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000i
 library(ggplot2)
 library(gridExtra)
 
-generate_plot <- function(data) {
+generate_plot <- function(data, plot_title) {
   ggplot(data, aes(x = Time, y = Pop_size, group = rep)) +
     geom_line(color = "lightgrey") + #plot all iterations as grey lines 
     stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", linewidth = 1) + #plot the mean as a dark/black line
-    labs(x = "Time", y = "Population Size", title = "Population Size Over Time") #add labels and titles
+    labs(x = "Time", y = "Population Size", title = plot_title) #add labels and titles
 } 
 
-plot_1<-generate_plot(data_1)
-plot_2<-generate_plot(data_2)
-plot_3<-generate_plot(data_3)
+plot_1<-generate_plot(data_1, "N15 100")
+plot_2<-generate_plot(data_2, "N30 100")
+plot_3<-generate_plot(data_3, "N250 100")
+
+plot_1b<-generate_plot(data_1b, "N15 1000")
+plot_2b<-generate_plot(data_2b, "N30 1000")
+plot_3b<-generate_plot(data_3b, "N250 1000")
+
 
 # print(plot_1)
 
 grid.arrange(plot_1, plot_2, plot_3, nrow = 1)
+grid.arrange(plot_1b, plot_2b, plot_3b, nrow = 1)
+grid.arrange(plot_1, plot_1b, nrow = 1)
 
 ```
 
@@ -59,6 +66,31 @@ combined_mean_pop$Analysis <- rep(c("Analysis 1", "Analysis 2", "Analysis 3"), e
 ggplot(combined_mean_pop, aes(x = Time, y = Pop_size, color = Analysis)) +
   geom_line() +
   labs(x = "Time", y = "Mean Population Size", title = "Mean Population Size Over Time")
+
+
+
+#### Also to compare 100 and 1000 iterations 
+# Calculate the mean population size for each analysis (1000 iterations)
+
+mean_pop1b <- aggregate(Pop_size ~ Time, data_1b, mean)
+mean_pop2b <- aggregate(Pop_size ~ Time, data_2b, mean)
+mean_pop3b <- aggregate(Pop_size ~ Time, data_3b, mean)
+
+# Remove the row where Time == 0, if it exists; this is necessary because the above function randomly seems to incorporate a timestep 0 in the first two dataframes? 
+mean_pop1b <- mean_pop1b[mean_pop1b$Time != 0, ]
+mean_pop2b <- mean_pop2b[mean_pop2b$Time != 0, ]
+mean_pop3b <- mean_pop3b[mean_pop3b$Time != 0, ]
+
+# Combine the mean population sizes from all analyses into a single data frame
+combined_mean_pop2 <- rbind(mean_pop1, mean_pop2, mean_pop3, mean_pop1b, mean_pop2b, mean_pop3b)
+combined_mean_pop2$Analysis <- rep(c("15 100", "30 100", "250 100", "15 1000", "30 1000", "250 1000"), each = nrow(mean_pop1))
+
+# Plot the combined mean population sizes
+ggplot(combined_mean_pop2, aes(x = Time, y = Pop_size, color = Analysis)) +
+  geom_line() +
+  labs(x = "Time", y = "Mean Population Size", title = "Mean Population Size Over Time")
+
+
 
 ```
 
