@@ -309,7 +309,7 @@ library(GMSE)
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 
-iterations <- 100 #number of iterations
+iterations <- 10 #number of iterations
 results <- list() #list to store results from each repetition
 
 for (rep in 1:iterations) {
