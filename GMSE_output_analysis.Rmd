@@ -6,14 +6,13 @@ output: html_document
 ---
 # Load data to be analysed 
 ```{r}
-data_1 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN15.csv", header=TRUE,sep=",")
-data_2 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN30.csv", header=TRUE,sep=",")
-data_3 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_type3_startN250.csv", header=TRUE,sep=",")
-data_1b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN15.csv", header=TRUE,sep=",")
-data_2b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN30.csv", header=TRUE,sep=",")
-data_3b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN250.csv", header=TRUE,sep=",")
+data_1 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/100iterations_type3_startN15.csv", header=TRUE,sep=",")
+data_2 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/100iterations_type3_startN30.csv", header=TRUE,sep=",")
+data_3 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/100iterations_type3_startN250.csv", header=TRUE,sep=",")
+data_1b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/1000iterations_type3_startN15.csv", header=TRUE,sep=",")
+data_2b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/1000iterations_type3_startN30.csv", header=TRUE,sep=",")
+data_3b <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/1000iterations_type3_startN250.csv", header=TRUE,sep=",")
 
-data_test<- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_testmixed_startN30.csv", header=TRUE,sep=",")
 ```
 
 # Plot all simulations on one graph + their mean
@@ -36,10 +35,6 @@ plot_3<-generate_plot(data_3, "N250 100")
 plot_1b<-generate_plot(data_1b, "N15 1000")
 plot_2b<-generate_plot(data_2b, "N30 1000")
 plot_3b<-generate_plot(data_3b, "N250 1000")
-
-plot_test<-generate_plot(data_test, "Different crop types")
-print(plot_test)
-
 
 # print(plot_1)
 

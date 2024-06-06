@@ -180,9 +180,11 @@ sim_old   <- gmse_apply(stakeholders    = 1,
                         get_res         = 'Full');
 old_obs  <- sim_old[["observation_array"]];
 
-# Currently, 3 variables are recorded as output
+# Initialise the results matrix for the current iteration; Currently, 3 variables are recorded as output
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
 sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
+colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
+
 for(time_step in 1:TMAX){
   sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full');
   sim_sum_1[time_step, 1] <- time_step;
@@ -283,7 +285,6 @@ for(time_step in 1:TMAX){
 
 }) #end of tryCatch
 
-colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
 sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
 print(sim_sum_1); 
 results[[rep]] <- sim_sum_1
@@ -293,8 +294,29 @@ results[[rep]] <- sim_sum_1
 combined_results <- do.call(rbind, results)
 combined_results[is.na(combined_results)] <- 0
 
-#file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/1000iterations_type3_startN15.csv"
-#write.csv(combined_results, file = file_path, row.names = FALSE)
+#now timestep is also recorded as a 0 from the moment extinction occurred, we want time step to be recorded correctly
+
+combined_results <- as.data.frame(combined_results)
+
+# Loop through each repetition
+for (rep_id in unique(combined_results$rep)) {
+  # Subset data for the current repetition
+  rep_data <- combined_results[combined_results$rep == rep_id, ]
+  
+  # Loop through each row in the current repetition's data
+  for (i in 2:nrow(rep_data)) {
+    # If the current time step is 0, replace it with the previous time step + 1
+    if (rep_data$Time[i] == 0) {
+      rep_data$Time[i] <- rep_data$Time[i - 1] + 1
+    }
+  }
+  
+  # Replace the data for the current repetition in the original data frame
+  combined_results[combined_results$rep == rep_id, ] <- rep_data
+}
+
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/NAMESIMULATION.csv" #Give the simulation an appropriate name
+write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
 
@@ -337,15 +359,18 @@ old_obs  <- sim_old[["observation_array"]];
 # Add crop types on layer 1 of the landscape with the crop_type function
 sim_old[["LAND"]] <- crop_type(land = sim_old[["LAND"]]);
 
-# Currently, 3 variables are recorded as output
+# Initialise the results matrix for the current iteration; Currently, 3 variables are recorded as output
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
 sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
+colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est")
+
 for(time_step in 1:TMAX){
   sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full');
   sim_sum_1[time_step, 1] <- time_step;
   sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
   sim_sum_1[time_step, 3] <- sim_new$basic_output$observation_results[1];
   next_time               <- time_step + 1; # What happens next time step?
+  
   if(next_time %in% JAN){
     sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
     sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
@@ -491,17 +516,11 @@ for(time_step in 1:TMAX){
   
   print(sim_sum_1[time_step,]); # BD: Just to see the simulation progress
 }
+
 }, error = function(e) { #tryCatch: if error occurs because N = 0
     cat("Error occurred in iteration", rep, ":", conditionMessage(e), "\n")
-    # If an error occurs (extinction), record Pop_size and Pop_est as 0
-    sim_sum_1 <- matrix(data = 0, nrow = TMAX, ncol = 3)
-    colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est")
-    sim_sum_1 <- cbind(rep, sim_sum_1)
-    results[[rep]] <- sim_sum_1
-
 }) #end of tryCatch
 
-colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
 sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
 print(sim_sum_1); 
 results[[rep]] <- sim_sum_1
@@ -511,7 +530,28 @@ results[[rep]] <- sim_sum_1
 combined_results <- do.call(rbind, results)
 combined_results[is.na(combined_results)] <- 0
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/100iterations_testmixed_startN30.csv"
+#now timestep is also recorded as a 0 from the moment extinction occurred, we want time step to be recorded correctly
+
+combined_results <- as.data.frame(combined_results)
+
+# Loop through each repetition
+for (rep_id in unique(combined_results$rep)) {
+  # Subset data for the current repetition
+  rep_data <- combined_results[combined_results$rep == rep_id, ]
+  
+  # Loop through each row in the current repetition's data
+  for (i in 2:nrow(rep_data)) {
+    # If the current time step is 0, replace it with the previous time step + 1
+    if (rep_data$Time[i] == 0) {
+      rep_data$Time[i] <- rep_data$Time[i - 1] + 1
+    }
+  }
+  
+  # Replace the data for the current repetition in the original data frame
+  combined_results[combined_results$rep == rep_id, ] <- rep_data
+}
+
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/test.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 ```
 
