@@ -59,7 +59,7 @@ mean_pop3 <- mean_pop3[mean_pop3$Time != 0, ]
 
 # Combine the mean population sizes from all analyses into a single data frame
 combined_mean_pop <- rbind(mean_pop1, mean_pop2, mean_pop3)
-combined_mean_pop$Analysis <- rep(c("Analysis 1", "Analysis 2", "Analysis 3"), each = nrow(mean_pop1))
+combined_mean_pop$Analysis <- rep(c("15 100", "30 100", "250 100"), each = nrow(mean_pop1))
 
 # Plot the combined mean population sizes
 ggplot(combined_mean_pop, aes(x = Time, y = Pop_size, color = Analysis)) +

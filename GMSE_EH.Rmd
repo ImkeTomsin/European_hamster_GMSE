@@ -51,7 +51,7 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 #This function is quite slow -- probably want to speed it up somehow
 ```
 
-# Function to add a crop type to each cell of the landscape
+# Function to add a crop type to each cell of the landscape 
 
 ```{r}
 # The 'land' in GMSE is a 3D array with the farm number in layer 3, the crop amount in layer 2, and nothing in layer 1. The code below redefines layer 1 by putting a crop type (1, 2 or 3) down for each farm number (you can change these as desired).The code assigns a random crop type to the land owned by each stakeholder. The function has to be run before looping over time. 
@@ -71,10 +71,12 @@ crop_type <- function(land, stakeholders = 10, types = 3){ # stakeholders: numbe
 
 ```
 
-```{r}
-# We could also use the above function to assign a fixed number of (random) stakeholders/farms a certain crop type
+# Alternative function to assign a fixed number of (random) stakeholders/farms a certain crop type
 
-crop_type <- function(land, stakeholders = 10, types = 2){ # stakeholders: number of stakeholders/farms
+```{r}
+
+
+crop_type2 <- function(land, stakeholders = 10, types = 2){ # stakeholders: number of stakeholders/farms
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
   
@@ -114,16 +116,16 @@ No or very late harvest, with vegetation being a mix of hamster-friendly crops a
 ```{r}
 # The function below checks each hamster's cell location, then checks the crop type on that location, and adjusts population parameters accordingly
 
-#The function currently changes mortality for hamsters in crop types 1 and 2 on a monthly basis, and changes lambda for hamsters in crop type 3 in the month August (= extra litter)
+# The function currently changes mortality for hamsters in crop types 1 on a monthly basis, and changes lambda for hamsters in crop type 3 in the month August (= extra litter)
 
 crop_hamster_1 <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
     for(i in 1:N) { 
-        xloc <- res[i, 5] +1; #+1 to fix indexing difference problem between R and C 
+        xloc <- res[i, 5] +1; #+1 to fix indexing difference problem between R and C (otherwise error occurs about the landscape starting in (0,0))
         yloc <- res[i, 6] +1;
         crop <- land[xloc, yloc, 1];
         
-        cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, probably has to be deleted later
+        cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, this shows that some hamsters' xloc or yloc randomly seems to change by 1 cell between simulations, even when movement is not simulated, sometimes both change, sometimes just one changes, and sometimes the crop type value (1, 2 or 3) also changes
       
           if (crop == 1) {
           res[i, 9] <- 1  # column 9 = death probability -> 100% mortality
@@ -142,9 +144,7 @@ crop_hamster_1 <- function(land, res){
 
 # GMSE simulations 
 
-## 1: for different parameter sets/crop types 
-
-Startende van X-aantal individuen, aantal stakeholders onbelangrijk hier omdat er geen acties ondernomen worden.
+## 1: Simulation for a certain set of parameters, no changes are made to the landscape. 
 
 2 litters, in June and July, movement in June and July, starting X of 15, 30, and 250 females (last one based on 50/500 rule)
 (no changes to landscape/only one crop type at a time)
@@ -162,7 +162,7 @@ for (rep in 1:iterations) {
   tryCatch({
 
 # Initialise the first output
-sim_old   <- gmse_apply(stakeholders    = 1, 
+sim_old   <- gmse_apply(stakeholders    = 1, # not important here as landscape is all the same and no actions are being taken
                         res_movement    = 0, 
                         remove_pr       = 1 - 0.976083968, 
                         lambda          = 0, 
@@ -274,16 +274,11 @@ for(time_step in 1:TMAX){
   
   #print(sim_sum_1[time_step,]); # Activate to see the simulation progress
 }
-
+  
 }, error = function(e) { #tryCatch: if error occurs because N = 0
     cat("Error occurred in iteration", rep, ":", conditionMessage(e), "\n")
-    # If an error occurs (extinction), record Pop_size and Pop_est as 0
-    sim_sum_1 <- matrix(data = 0, nrow = TMAX, ncol = 3)
-    colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est")
-    sim_sum_1 <- cbind(rep, sim_sum_1)
-    results[[rep]] <- sim_sum_1
-
 }) #end of tryCatch
+
 
 sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
 print(sim_sum_1); 
@@ -321,12 +316,12 @@ write.csv(combined_results, file = file_path, row.names = FALSE)
 ```
 
 
-## 2: including multiple different crop types
+## 2: Simulations modelling multiple different crop types on the landscape. Crop type influences the population parameters of the hamsters ocurring in it.
 
 ```{r}
 library(GMSE)
 
-#parameters specified below are for hamsters in crop type 3. For types 1 and 2, a different mortality is modelled each month. 
+#parameters specified below are for hamsters in crop type 2. For type 3 an extra litter is modelled, for type 1 a different mortality is modelled (no survival) 
 
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
@@ -346,7 +341,7 @@ sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in functio
                         observe_type    = 2, # but only once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 30, # N 
+                        RESOURCE_ini    = 30, # start N 
                         culling         = FALSE,
                         land_ownership  = TRUE,
                         age_repr        = 1,
@@ -553,5 +548,6 @@ for (rep_id in unique(combined_results$rep)) {
 
 file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/test.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
+
 ```
 
