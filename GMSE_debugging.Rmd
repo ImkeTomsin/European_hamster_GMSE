@@ -1,0 +1,196 @@
+---
+title: "GMSE_EH"
+author: "Imke Tomsin"
+date: "2024-04-03"
+output: html_document
+---
+
+# Defining the different months that will be simulated
+
+```{r}
+TMAX <- 48; # Maximum number of months in the simulation
+JAN  <- seq(from = 1,  to = TMAX, by = 12); # Time steps in JAN, FEB, MAR, etc.
+FEB  <- seq(from = 2,  to = TMAX, by = 12);
+MAR  <- seq(from = 3,  to = TMAX, by = 12);
+APR  <- seq(from = 4,  to = TMAX, by = 12);
+MAY  <- seq(from = 5,  to = TMAX, by = 12);
+JUN  <- seq(from = 6,  to = TMAX, by = 12);
+JUL  <- seq(from = 7,  to = TMAX, by = 12);
+AUG  <- seq(from = 8,  to = TMAX, by = 12);
+SEP  <- seq(from = 9,  to = TMAX, by = 12);
+OCT  <- seq(from = 10, to = TMAX, by = 12);
+NOV  <- seq(from = 11, to = TMAX, by = 12);
+DEC  <- seq(from = 12, to = TMAX, by = 12)
+# This way, we are able to use each time step in the GMSE loop to identify the month
+```
+
+# GMSE simulations 
+
+#If we run the simulations below, without any extra functions, and we print out the resource array for each time step, we see that the X and Y locations (columns 5 and 6) exhibit the same problem. Between time steps when there is no movement, hamsters sometimes move by one cell. This seems to happen randomly. 
+
+```{r}
+
+library(GMSE)
+DIM_1 <- 447; # Land dimension 1
+DIM_2 <- 447; # Land dimension 2
+
+iterations <- 2 #number of iterations
+results <- list() #list to store results from each repetition
+
+for (rep in 1:iterations) {
+  tryCatch({
+
+# Initialise the first output
+sim_old   <- gmse_apply(stakeholders    = 1, # not important here as landscape is all the same and no actions are being taken
+                        res_movement    = 0,
+                        res_move_type   = 0, # ADDED THIS TO SEE IF THIS SOLVES THE PROBLEM
+                        remove_pr       = 1 - 0.976083968, 
+                        lambda          = 0, 
+                        res_death_type  = 1,
+                        observe_type    = 2, # but only once a year
+                        res_move_obs    = FALSE, 
+                        max_ages        = 24, 
+                        RESOURCE_ini    = 30, # N 
+                        culling         = FALSE,
+                        land_ownership  = TRUE,
+                        age_repr        = 1,
+                        land_dim_1      = DIM_1,
+                        land_dim_2      = DIM_2,
+                        manage_target   = 2500,
+                        get_res         = 'Full');
+old_obs  <- sim_old[["observation_array"]];
+
+# Initialise the results matrix for the current iteration; Currently, 3 variables are recorded as output
+# Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
+sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 2);
+colnames(sim_sum_1) <- c("Time", "Pop_size");
+
+for(time_step in 1:TMAX){
+  sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full');
+  sim_sum_1[time_step, 1] <- time_step;
+  sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
+  print(sim_new$resource_array[,1:6])
+  
+  
+  next_time               <- time_step + 1; # What happens next time step?
+  if(next_time %in% JAN){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% FEB){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.94824969; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% MAR){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.9023544; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% APR){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% MAY){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% JUN){
+    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% JUL){
+    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
+    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+  }
+  if(next_time %in% AUG){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+  }
+  if(next_time %in% SEP){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  
+  if(next_time %in% OCT){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.891729601; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% NOV){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.939895976; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  if(next_time %in% DEC){
+    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    sim_new[["resource_array"]][, 9]  <- 1 - 0.956833861; # Death probability
+    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+  }
+  sim_old <- sim_new; # BD: This should always go at the end
+  
+  #print(sim_sum_1[time_step,]); # Activate to see the simulation progress
+}
+  
+}, error = function(e) { #tryCatch: if error occurs because N = 0
+    cat("Error occurred in iteration", rep, ":", conditionMessage(e), "\n")
+}) #end of tryCatch
+
+
+sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
+print(sim_sum_1); 
+results[[rep]] <- sim_sum_1
+
+}
+
+combined_results <- do.call(rbind, results)
+combined_results[is.na(combined_results)] <- 0
+
+#now timestep is also recorded as a 0 from the moment extinction occurred, we want time step to be recorded correctly
+
+combined_results <- as.data.frame(combined_results)
+
+# Loop through each repetition
+for (rep_id in unique(combined_results$rep)) {
+  # Subset data for the current repetition
+  rep_data <- combined_results[combined_results$rep == rep_id, ]
+  
+  # Loop through each row in the current repetition's data
+  for (i in 2:nrow(rep_data)) {
+    # If the current time step is 0, replace it with the previous time step + 1
+    if (rep_data$Time[i] == 0) {
+      rep_data$Time[i] <- rep_data$Time[i - 1] + 1
+    }
+  }
+  
+  # Replace the data for the current repetition in the original data frame
+  combined_results[combined_results$rep == rep_id, ] <- rep_data
+}
+
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/test2.csv" #Give the simulation an appropriate name
+write.csv(combined_results, file = file_path, row.names = FALSE)
+
+```
+
+
