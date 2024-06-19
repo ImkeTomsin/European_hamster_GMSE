@@ -75,7 +75,6 @@ crop_type <- function(land, stakeholders = 10, types = 3){ # stakeholders: numbe
 
 ```{r}
 
-
 crop_type2 <- function(land, stakeholders = 10, types = 2){ # stakeholders: number of stakeholders/farms
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
@@ -185,8 +184,8 @@ old_obs  <- sim_old[["observation_array"]];
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
 sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
 colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
-
 moving_month <- 0;
+
 for(time_step in 1:TMAX){
   sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full',
                                         res_move_type = moving_month);
@@ -225,13 +224,13 @@ for(time_step in 1:TMAX){
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUN){
-    moving_month                      <- 1; # Not a moving month
+    moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
     sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUL){
-    moving_month                      <- 1; # Not a moving month
+    moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
     sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -337,7 +336,8 @@ for (rep in 1:iterations) {
 
 # Initialise the first output
 sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in function crop_type
-                        res_movement    = 0, 
+                        res_movement    = 100, 
+                        res_move_type   = 0,
                         remove_pr       = 1 - 0.976083968, 
                         lambda          = 0, 
                         res_death_type  = 1,
@@ -361,16 +361,18 @@ sim_old[["LAND"]] <- crop_type(land = sim_old[["LAND"]]);
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
 sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
 colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est")
+moving_month <- 0;
 
 for(time_step in 1:TMAX){
-  sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full');
+  sim_new                 <- gmse_apply(old_list = sim_old, get_res = 'Full',
+                                        res_move_type = moving_month);
   sim_sum_1[time_step, 1] <- time_step;
   sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
   sim_sum_1[time_step, 3] <- sim_new$basic_output$observation_results[1];
   next_time               <- time_step + 1; # What happens next time step?
   
   if(next_time %in% JAN){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.976083968; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -381,7 +383,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% FEB){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.94824969; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -392,7 +394,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% MAR){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.9023544; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -403,7 +405,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% APR){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -414,7 +416,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% MAY){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -425,7 +427,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% JUN){
-    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
     sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -436,7 +438,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% JUL){
-    sim_new[["resource_array"]][, 7]  <- 100;       # Movement distance
+    moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
     sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -449,7 +451,7 @@ for(time_step in 1:TMAX){
                                                       res  = temp_res);
   }
   if(next_time %in% AUG){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     old_obs                           <- sim_new[["observation_array"]];
@@ -463,7 +465,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res)
   }
   if(next_time %in% SEP){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -476,7 +478,7 @@ for(time_step in 1:TMAX){
   }
   
   if(next_time %in% OCT){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.891729601; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -489,7 +491,7 @@ for(time_step in 1:TMAX){
     
   }
   if(next_time %in% NOV){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.939895976; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -500,7 +502,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% DEC){
-    sim_new[["resource_array"]][, 7]  <- 0;         # Movement distance
+    moving_month                      <- 0;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.956833861; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
