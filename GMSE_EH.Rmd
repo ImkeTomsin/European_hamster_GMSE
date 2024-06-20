@@ -56,13 +56,13 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 ```{r}
 # The 'land' in GMSE is a 3D array with the farm number in layer 3, the crop amount in layer 2, and nothing in layer 1. The code below redefines layer 1 by putting a crop type (1, 2 or 3) down for each farm number (you can change these as desired).The code assigns a random crop type to the land owned by each stakeholder. The function has to be run before looping over time. 
 
-crop_type <- function(land, stakeholders = 10, types = 3){ # stakeholders: number of stakeholders/farms, types = number of possible crop types
+crop_type <- function(land, agents = 11, types = 3){ # agents = manager + number of stakeholders, types = number of possible crop types
   xdim <- dim(land)[1];
   ydim <- dim(land)[2];
   for(i in 1:xdim){   
   for(j in 1:ydim){
-        if (land[i, j, 3] %in% 1:stakeholders) {  #1:number of farms/stakeholders 
-          land[i, j, 1] <- sample(1:types, 1) #1:number of possible crop types 
+        if (land[i, j, 3] %in% 1:agents) {  #1:number of farms/stakeholders 
+          land[i, j, 1] <- sample(1:types, 1) #1:number of possible crop types, each cell gets a different one with this function
       }
     }
   } 
@@ -71,32 +71,75 @@ crop_type <- function(land, stakeholders = 10, types = 3){ # stakeholders: numbe
 
 ```
 
-# Alternative function to assign a fixed number of (random) stakeholders/farms a certain crop type
+# Alternative functions to assign a fixed number of (random) stakeholders/farms a certain crop type
+
+To assign a certain crop type to a certain amount of fields, and assign the other fields a random type:
 
 ```{r}
-
-crop_type2 <- function(land, stakeholders = 10, types = 2){ # stakeholders: number of stakeholders/farms
+crop_type <- function(land, agents = 11, types = 2) { #types = amount of crop types of which no fixed number is assigned to fields
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
   
-  type3_stakeholders <- sample(1:stakeholders, 5) # Select 50 random stakeholders to get assigned crop type 3
+  type3_stakeholders <- sample(2:agents, 5) # Select 5 random stakeholders to get assigned crop type 3
   
-  for(i in 1:xdim){   
-    for(j in 1:ydim){
-      if (land[i, j, 3] %in% 1:stakeholders) {
-      if (land[i, j, 3] %in% 1:type3_stakeholders) {  
-          land[i, j, 1] <- 3 
-      } else { 
-        land[i, j, 1] <- sample(1:types, 1) # others are chosen randomly
-      }
+  # Create a vector to store the crop type for each stakeholder
+  stakeholder_types <- rep(NA, agents)
+  
+  for (stakeholder in 2:agents) {
+    if (stakeholder %in% type3_stakeholders) {
+      stakeholder_types[stakeholder] <- 3
+    } else {
+      stakeholder_types[stakeholder] <- sample(1:types, 1)
     }
+  }
+  
+  for (i in 1:xdim) {   
+    for (j in 1:ydim) {
+      if (land[i, j, 3] %in% 2:agents) {
+        land[i, j, 1] <- stakeholder_types[land[i, j, 3]]
+      }
     } 
   }
-    return(land);
-} 
-
+  return(land)
+}
 ```
 
+To assign a certain amount of fields a certain crop type
+```{r}
+crop_type <- function(land, agents = 11) { # agents = 1 (manager) + number of stakeholders
+  xdim <- dim(land)[1]
+  ydim <- dim(land)[2]
+  
+  # Randomly assign stakeholders to crop types
+  stakeholders_vector <- sample(2:agents) #randomly shuffle the stakeholders (agents), but leave out the first (= always the manager)
+  type3_stakeholders <- stakeholders_vector[1:2] #2 get type 3
+  type2_stakeholders <- stakeholders_vector[3:6] #4 get type 2
+  type1_stakeholders <- stakeholders_vector[7:10] #4 get type 1
+  
+  # Create a vector to store the crop type for each stakeholder
+  stakeholder_types <- rep(NA, agents)
+  
+  for (stakeholder in 2:agents) { 
+    if (stakeholder %in% type3_stakeholders) {
+      stakeholder_types[stakeholder] <- 3
+    } else if (stakeholder %in% type2_stakeholders) {
+      stakeholder_types[stakeholder] <- 2
+    } else if (stakeholder %in% type1_stakeholders) {
+      stakeholder_types[stakeholder] <- 1
+    }
+  }
+
+  for (i in 1:xdim) {   
+    for (j in 1:ydim) {
+      if (land[i, j, 3] %in% 2:agents) {
+        land[i, j, 1] <- stakeholder_types[land[i, j, 3]]
+      }
+    } 
+  }
+  return(land)
+}
+
+```
 
 # Functions to change population parameters based on crop type
 
@@ -369,6 +412,7 @@ for(time_step in 1:TMAX){
   sim_sum_1[time_step, 1] <- time_step;
   sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
   sim_sum_1[time_step, 3] <- sim_new$basic_output$observation_results[1];
+  
   next_time               <- time_step + 1; # What happens next time step?
   
   if(next_time %in% JAN){
@@ -551,8 +595,12 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/test.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/test_landscape.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
+
+image(x = sim_old$LAND[,,1], col = c("blue", "green", "yellow"), xaxt = "n", yaxt = "n")
+legend("topright", legend = c("Crop Type 1", "Crop Type 2", "Crop Type 3"),
+       fill = c("blue", "green", "yellow"), cex = 0.8) #to show crop type distribution in the landscape
 
 ```
 
