@@ -119,5 +119,49 @@ probability_extinction <- extinction_count / reps
 print(paste("Probability of extinction:", probability_extinction))
 
 ```
+```{r}
+# Analyses of crop type based simulations 
+
+data_crops <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/croptypes_4x1_4x2_2x3_100it_30startN_simulation2.csv", header=TRUE,sep=",")
+
+library(ggplot2)
+library(gridExtra)
+
+generate_plot <- function(data, plot_title) {
+  ggplot(data, aes(x = Time, y = Pop_size, group = rep)) +
+    geom_line(color = "lightgrey") + #plot all iterations as grey lines 
+    stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", linewidth = 1) + #plot the mean as a dark/black line
+    labs(x = "Time", y = "Population Size", title = plot_title) #add labels and titles
+} 
+
+plot_crops<-generate_plot(data_crops, "N30, 2 type 3, 4 type 1 and 2")
+
+print(plot_crops)
+
+# extinction probability 
+reps <- max(data_crops$rep)
+
+# Initialize a counter for extinction events
+extinction_count <- 0
+
+# Loop through each repetition
+for (i in 1:reps) {
+  # Subset data for the current repetition
+  rep_data <- subset(data_crops, rep == i)
+  
+  # Check if the population size ever reaches zero
+  if (any(rep_data$Pop_size == 0)) {
+    extinction_count <- extinction_count + 1
+  }
+}
+
+# Calculate the probability of extinction
+probability_extinction <- extinction_count / reps
+
+# Print the result
+print(paste("Probability of extinction:", probability_extinction))
+
+
+```
 
 

@@ -449,7 +449,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% APR){
-    moving_month                      <- 0;         # No movement 
+    moving_month                      <- 1;         # No movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -466,6 +466,8 @@ for(time_step in 1:TMAX){
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     
     temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
     temp_land                         <- sim_new[["LAND"]];
     sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
                                                         res  = temp_res);
@@ -595,7 +597,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/croptypes_4x1_4x2_2x3_100it_30startN.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/croptypes_4x1_4x2_2x3_100it_30startN_simulation2.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
