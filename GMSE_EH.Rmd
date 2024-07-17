@@ -199,7 +199,7 @@ library(GMSE)
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 
-iterations <- 1000 #number of iterations
+iterations <- 100 #number of iterations
 results <- list() #list to store results from each repetition
 
 for (rep in 1:iterations) {
@@ -274,22 +274,22 @@ for(time_step in 1:TMAX){
   if(next_time %in% JUN){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUL){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
                                                 DIM_2 = DIM_2);
   }
   if(next_time %in% AUG){
-    moving_month                      <- 0; # Not a moving month
+    moving_month                      <- 1; # Not a moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
-    sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -300,6 +300,9 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
   }
   
   if(next_time %in% OCT){
@@ -360,7 +363,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation4_1000it_250startN.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation5_100it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
