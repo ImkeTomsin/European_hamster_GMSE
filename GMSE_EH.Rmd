@@ -1,14 +1,16 @@
 ---
-title: "GMSE_EH"
+title: "GMSE European hamster model"
 author: "Imke Tomsin"
-date: "2024-04-03"
-output: html_document
+date: "2023-2024"
+output:
+  word_document: default
+  html_document: default
 ---
 
 # Defining the different months that will be simulated
 
-```{r}
-TMAX <- 48; # Maximum number of months in the simulation
+```{r, , echo=TRUE, eval=FALSE}
+TMAX <- 60; # Maximum number of months in the simulation
 JAN  <- seq(from = 1,  to = TMAX, by = 12); # Time steps in JAN, FEB, MAR, etc.
 FEB  <- seq(from = 2,  to = TMAX, by = 12);
 MAR  <- seq(from = 3,  to = TMAX, by = 12);
@@ -26,7 +28,7 @@ DEC  <- seq(from = 12, to = TMAX, by = 12)
 
 # Function to simulate carrying capacity by cell 
 
-```{r}
+```{r, echo=TRUE, eval=FALSE}
 cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
   for(i in 1:DIM_1){
     for(j in 1:DIM_2){
@@ -53,7 +55,7 @@ cell_K <- function(res, DIM_1 = 447, DIM_2 = 447){
 
 # Function to add a crop type to each cell of the landscape 
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 # The 'land' in GMSE is a 3D array with the farm number in layer 3, the crop amount in layer 2, and nothing in layer 1. The code below redefines layer 1 by putting a crop type (1, 2 or 3) down for each farm number (you can change these as desired).The code assigns a random crop type to the land owned by each stakeholder. The function has to be run before looping over time. 
 
 crop_type <- function(land, agents = 11, types = 3){ # agents = manager + number of stakeholders, types = number of possible crop types
@@ -75,7 +77,7 @@ crop_type <- function(land, agents = 11, types = 3){ # agents = manager + number
 
 To assign a certain crop type to a certain amount of fields, and assign the other fields a random type:
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 crop_type <- function(land, agents = 11, types = 2) { #types = amount of crop types of which no fixed number is assigned to fields
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
@@ -105,8 +107,8 @@ crop_type <- function(land, agents = 11, types = 2) { #types = amount of crop ty
 ```
 
 To assign a certain number of fields a certain crop type
-```{r}
-crop_type <- function(land, agents = 11) { # agents = 1 (manager) + number of stakeholders
+```{r, , echo=TRUE, eval=FALSE}
+crop_type2 <- function(land, agents = 11) { # agents = 1 (manager) + number of stakeholders
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
   
@@ -155,12 +157,12 @@ Later harvests allow for an additional litter
 Not in here yet but I might want to add it, crop type 4: Hamster heaven. 
 No or very late harvest, with vegetation being a mix of hamster-friendly crops and herbs etc. leading to a higher lambda. 
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 # The function below checks each hamster's cell location, then checks the crop type on that location, and adjusts population parameters accordingly
 
 # The function currently changes mortality for hamsters in crop types 1 on a monthly basis, and changes lambda for hamsters in crop type 3 in the month August (= extra litter)
 
-crop_hamster_1 <- function(land, res){     
+crop_hamster <- function(land, res){     
     N <- dim(res)[1]; # Number of hamsters
     for(i in 1:N) { 
         xloc <- res[i, 5] +1; #+1 to fix indexing difference problem between R and C (otherwise error occurs about the landscape starting in (0,0))
@@ -191,13 +193,13 @@ crop_hamster_1 <- function(land, res){
 2 litters, in June and July, movement in June and July, starting X of 15, 30, and 250 females (last one based on 50/500 rule)
 (no changes to landscape/only one crop type at a time)
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 
 library(GMSE)
 DIM_1 <- 447; # Land dimension 1
 DIM_2 <- 447; # Land dimension 2
 
-iterations <- 100 #number of iterations
+iterations <- 1000 #number of iterations
 results <- list() #list to store results from each repetition
 
 for (rep in 1:iterations) {
@@ -212,10 +214,10 @@ sim_old   <- gmse_apply(stakeholders    = 1, # not important here as landscape i
                         observe_type    = 2, # but only once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 15, # N 
+                        RESOURCE_ini    = 250, # N 
                         culling         = FALSE,
                         land_ownership  = TRUE,
-                        age_repr        = 1,
+                        age_repr        = 4,
                         land_dim_1      = DIM_1,
                         land_dim_2      = DIM_2,
                         manage_target   = 2500,
@@ -223,10 +225,10 @@ sim_old   <- gmse_apply(stakeholders    = 1, # not important here as landscape i
                         get_res         = 'Full');
 old_obs  <- sim_old[["observation_array"]];
 
-# Initialise the results matrix for the current iteration; Currently, 3 variables are recorded as output
+# Initialise the results matrix for the current iteration; Currently, 2 variables are recorded as output
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
-sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 3);
-colnames(sim_sum_1) <- c("Time", "Pop_size", "Pop_est");
+sim_sum_1 <- matrix(data = NA, nrow = TMAX, ncol = 2);
+colnames(sim_sum_1) <- c("Time", "Pop_size");
 moving_month <- 0;
 
 for(time_step in 1:TMAX){
@@ -234,7 +236,7 @@ for(time_step in 1:TMAX){
                                         res_move_type = moving_month);
   sim_sum_1[time_step, 1] <- time_step;
   sim_sum_1[time_step, 2] <- sim_new$basic_output$resource_results[1];
-  sim_sum_1[time_step, 3] <- sim_new$basic_output$observation_results[1];
+  
   next_time               <- time_step + 1; # What happens next time step?
   if(next_time %in% JAN){
     moving_month                      <- 0; # Not a moving month
@@ -255,7 +257,7 @@ for(time_step in 1:TMAX){
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% APR){
-    moving_month                      <- 0; # Not a moving month
+    moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -265,17 +267,20 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]][, 9]  <- 1 - 0.805694059; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
+    temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
   }
   if(next_time %in% JUN){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUL){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -317,7 +322,7 @@ for(time_step in 1:TMAX){
   }
   sim_old <- sim_new; # BD: This should always go at the end
   
-  #print(sim_sum_1[time_step,]); # Activate to see the simulation progress
+  #print(sim_sum_1[time_step,]); #Activate to see the simulation progress
 }
   
 }, error = function(e) { #tryCatch: if error occurs because N = 0
@@ -355,7 +360,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/NAMESIMULATION.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation4_1000it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
@@ -363,7 +368,7 @@ write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ## 2: Simulations modelling multiple different crop types on the landscape. Crop type influences the population parameters of the hamsters ocurring in it.
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 library(GMSE)
 
 #parameters specified below are for hamsters in crop type 2. For type 3 an extra litter is modelled, for type 1 a different mortality is modelled (no survival) 
@@ -378,7 +383,7 @@ for (rep in 1:iterations) {
   tryCatch({
 
 # Initialise the first output
-sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in function crop_type
+sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in function crop_type!
                         res_movement    = 100, 
                         res_move_type   = 0,
                         remove_pr       = 1 - 0.976083968, 
@@ -390,15 +395,15 @@ sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in functio
                         RESOURCE_ini    = 30, # start N 
                         culling         = FALSE,
                         land_ownership  = TRUE,
-                        age_repr        = 1,
+                        age_repr        = 4,
                         land_dim_1      = DIM_1,
                         land_dim_2      = DIM_2,
                         manage_target   = 2500,
                         get_res         = 'Full');
 old_obs  <- sim_old[["observation_array"]];
 
-# Add crop types on layer 1 of the landscape with the crop_type function
-sim_old[["LAND"]] <- crop_type(land = sim_old[["LAND"]]);
+# Add crop types on layer 1 of the landscape with the crop_type(2) function
+sim_old[["LAND"]] <- crop_type2(land = sim_old[["LAND"]]);
 
 # Initialise the results matrix for the current iteration; Currently, 3 variables are recorded as output
 # Double-brackets: technically a bit more secure. It works if you edit columns of the resource_array directly.
@@ -423,7 +428,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% FEB){
@@ -434,7 +439,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% MAR){
@@ -445,7 +450,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% APR){
@@ -456,7 +461,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% MAY){
@@ -469,7 +474,7 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
                                                 DIM_2 = DIM_2);
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% JUN){
@@ -480,7 +485,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% JUL){
@@ -493,7 +498,7 @@ for(time_step in 1:TMAX){
                                                 DIM_2 = DIM_2);
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                       res  = temp_res);
   }
   if(next_time %in% AUG){
@@ -507,7 +512,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land,  #function 2 because birth rate changes for type 3
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land,  #function 2 because birth rate changes for type 3
                                                         res  = temp_res)
   }
   if(next_time %in% SEP){
@@ -519,7 +524,7 @@ for(time_step in 1:TMAX){
 
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   
@@ -531,7 +536,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
     
     
@@ -544,7 +549,7 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
   if(next_time %in% DEC){
@@ -555,12 +560,12 @@ for(time_step in 1:TMAX){
     
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster_1(land = temp_land, 
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land, 
                                                         res  = temp_res);
   }
-  sim_old <- sim_new; # BD: This should always go at the end
+  sim_old <- sim_new; # This should always go at the end
   
-  print(sim_sum_1[time_step,]); # BD: Just to see the simulation progress
+  #print(sim_sum_1[time_step,]); #Activate to see the simulation progress
 }
 
 }, error = function(e) { #tryCatch: if error occurs because N = 0
@@ -602,7 +607,7 @@ write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
 
-```{r}
+```{r, , echo=TRUE, eval=FALSE}
 # Crop type plot
 # Adjust plot margins to make space for the legend
 par(mar = c(2, 3, 2, 8) + 0.2)
