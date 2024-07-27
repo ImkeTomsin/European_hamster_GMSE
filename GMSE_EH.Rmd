@@ -169,14 +169,14 @@ crop_hamster <- function(land, res){
         yloc <- res[i, 6] +1;
         crop <- land[xloc, yloc, 1];
         
-        cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, this shows that some hamsters' xloc or yloc randomly seems to change by 1 cell between simulations, even when movement is not simulated, sometimes both change, sometimes just one changes, and sometimes the crop type value (1, 2 or 3) also changes
+        #cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, this shows that some hamsters' xloc or yloc randomly seems to change by 1 cell between simulations, even when movement is not simulated, sometimes both change, sometimes just one changes, and sometimes the crop type value (1, 2 or 3) also changes
       
           if (crop == 1) {
           res[i, 9] <- 1  # column 9 = death probability -> 100% mortality
         #} else if (crop == 2 && next_time %in% c(AUG,SEP)) {
-          #res[i, 9] <- res[i, 9] + 0.05  # increase mortality by 5% in months after harvest !! LOOK FOR RIGHT PARAMETER TO USE HERE !!
-        } else if (crop == 3 && next_time %in% AUG) { #only for the month August
-          res[i, 10] <- 1.18
+          #res[i, 9] <- res[i, 9] + 0.05  # increase mortality by 5% in months after harvest 
+        } else if (crop == 3 && next_time %in% c(JUN, JUL, AUG)) { 
+          res[i, 10] <- 1.46
         } else {
           # Default case, nothing changes
       }
@@ -274,13 +274,13 @@ for(time_step in 1:TMAX){
   if(next_time %in% JUN){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 3;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
   }
   if(next_time %in% JUL){
     moving_month                      <- 1; # A moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 3;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -289,7 +289,7 @@ for(time_step in 1:TMAX){
   if(next_time %in% AUG){
     moving_month                      <- 1; # Not a moving month
     sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.28;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 3;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -363,7 +363,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation5_100it_250startN.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation8_100it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
@@ -384,6 +384,41 @@ results <- list() #list to store results from each repetition
 
 for (rep in 1:iterations) {
   tryCatch({
+    
+################################### Adding the landscape function here = different landscape for each iteration   
+crop_type2 <- function(land, agents = 11) { # agents = 1 (manager) + number of stakeholders
+  xdim <- dim(land)[1]
+  ydim <- dim(land)[2]
+  
+  # Randomly assign stakeholders to crop types
+  stakeholders_vector <- sample(2:agents) #randomly shuffle the stakeholders (agents), but leave out the first (= always the manager)
+  type3_stakeholders <- stakeholders_vector[1:2] #2 get type 3
+  type2_stakeholders <- stakeholders_vector[3:6] #4 get type 2
+  type1_stakeholders <- stakeholders_vector[7:10] #4 get type 1
+  
+  # Create a vector to store the crop type for each stakeholder
+  stakeholder_types <- rep(NA, agents)
+  
+  for (stakeholder in 2:agents) { 
+    if (stakeholder %in% type3_stakeholders) {
+      stakeholder_types[stakeholder] <- 3
+    } else if (stakeholder %in% type2_stakeholders) {
+      stakeholder_types[stakeholder] <- 2
+    } else if (stakeholder %in% type1_stakeholders) {
+      stakeholder_types[stakeholder] <- 1
+    }
+  }
+
+  for (i in 1:xdim) {   
+    for (j in 1:ydim) {
+      if (land[i, j, 3] %in% 2:agents) {
+        land[i, j, 1] <- stakeholder_types[land[i, j, 3]]
+      }
+    } 
+  }
+  return(land)
+}
+#####################################################
 
 # Initialise the first output
 sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in function crop_type!
@@ -395,7 +430,7 @@ sim_old   <- gmse_apply(stakeholders    = 10, # should be the same as in functio
                         observe_type    = 2, # but only once a year
                         res_move_obs    = FALSE, 
                         max_ages        = 24, 
-                        RESOURCE_ini    = 30, # start N 
+                        RESOURCE_ini    = 250, # start N 
                         culling         = FALSE,
                         land_ownership  = TRUE,
                         age_repr        = 4,
@@ -457,7 +492,7 @@ for(time_step in 1:TMAX){
                                                         res  = temp_res);
   }
   if(next_time %in% APR){
-    moving_month                      <- 1;         # No movement 
+    moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.811569975; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
@@ -483,7 +518,7 @@ for(time_step in 1:TMAX){
   if(next_time %in% JUN){
     moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.794513672; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     
     temp_res                          <- sim_new[["resource_array"]];
@@ -494,7 +529,7 @@ for(time_step in 1:TMAX){
   if(next_time %in% JUL){
     moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.767700722; # Death probability
-    sim_new[["resource_array"]][, 10] <- 1.18;         # Birth probability
+    sim_new[["resource_array"]][, 10] <- 1.19;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
@@ -505,17 +540,16 @@ for(time_step in 1:TMAX){
                                                       res  = temp_res);
   }
   if(next_time %in% AUG){
-    moving_month                      <- 0;         # No movement 
+    moving_month                      <- 1;         # Movement 
     sim_new[["resource_array"]][, 9]  <- 1 - 0.842305069; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     old_obs                           <- sim_new[["observation_array"]];
     temp_res                          <- sim_new[["resource_array"]];
     sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
                                                 DIM_2 = DIM_2);
-    
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
-    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land,  #function 2 because birth rate changes for type 3
+    sim_new[["resource_array"]]       <- crop_hamster(land = temp_land,  
                                                         res  = temp_res)
   }
   if(next_time %in% SEP){
@@ -523,7 +557,9 @@ for(time_step in 1:TMAX){
     sim_new[["resource_array"]][, 9]  <- 1 - 0.877005333; # Death probability
     sim_new[["resource_array"]][, 10] <- 0;         # Birth probability
     sim_new[["observation_array"]]    <- old_obs;   # Use old observations
-    
+    temp_res                          <- sim_new[["resource_array"]];
+    sim_new[["resource_array"]]       <- cell_K(res   = temp_res, DIM_1 = DIM_1, 
+                                                DIM_2 = DIM_2);
 
     temp_res                          <- sim_new[["resource_array"]];
     temp_land                         <- sim_new[["LAND"]];
@@ -579,6 +615,23 @@ sim_sum_1 <- cbind(rep, sim_sum_1); # Add iteration number as a column
 print(sim_sum_1); 
 results[[rep]] <- sim_sum_1
 
+###################################### Extra function to save landscape layout for each simulation
+# Get the current timestamp
+timestamp <- format(Sys.time(), "%Y%m%d-%H%M%S")
+
+# Crop type plot
+# Adjust plot margins to make space for the legend
+output_folder<- "C:/Users/imket/Documents/UAntwerpen/Master thesis/Figures/Landscape simulations/Simulation 9"
+filename_crop <- file.path(output_folder, paste0(timestamp, ".png"))
+png(filename_crop, width = 1000, height = 800)
+par(mar = c(5, 4, 4, 8) + 0.1)
+image(z = sim_old$LAND[,,1], col = c("#FF6961", "#EBD657", "#92C37F"), xaxt = "n", yaxt = "n", 
+      main = "Crop Type Distribution", bty = "n", cex.main = 1.5, cex.lab = 1.2)
+legend("right", inset = c(-0.13, 0),  legend = c("Crop Type 1", "Crop Type 2", "Crop Type 3"), 
+       fill = c("#FF6961", "#EBD657", "#92C37F"), xpd = TRUE, cex = 1) # to show crop type distribution in the landscape
+dev.off()
+#####################################
+
 }
 
 combined_results <- do.call(rbind, results)
@@ -605,7 +658,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/croptypes_4x1_4x2_2x3_100it_30startN_simulation2.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation9_100it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
