@@ -62,7 +62,7 @@ new_rows <- sim_5 %>%
 sim_5 <- bind_rows(sim_5, new_rows)
 
 
-sim_6 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation6_4x1_4x2_2x3_100it_250startN.csv", header=TRUE,sep=",")
+sim_6 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation6_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_6 %>%
   group_by(rep) %>%
@@ -82,7 +82,7 @@ new_rows <- sim_7 %>%
 # Bind the new rows to the original data
 sim_7 <- bind_rows(sim_7, new_rows)
 
-sim_8 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation8_100it_250startN.csv", header=TRUE,sep=",")
+sim_8 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation8_4x1_4x2_2x3_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_8 %>%
   group_by(rep) %>%
@@ -91,6 +91,27 @@ new_rows <- sim_8 %>%
   select(rep, Time, Pop_size)
 # Bind the new rows to the original data
 sim_8 <- bind_rows(sim_8, new_rows)
+
+sim_9 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation9_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_9 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_9 <- bind_rows(sim_9, new_rows)
+
+sim_10 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation10_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_10 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_10 <- bind_rows(sim_10, new_rows)
+
 
 
 ```
@@ -115,11 +136,12 @@ plot_1<-generate_plot(sim_1, "Scenario 1")
 plot_2<-generate_plot(sim_2, "Scenario 2")
 plot_3<-generate_plot(sim_3, "Scenario 3")
 plot_4<-generate_plot(sim_4, "Scenario 4")
-
 plot_5<-generate_plot(sim_5, "Scenario 5")
 plot_6<-generate_plot(sim_6, "Scenario 6")
 plot_7<-generate_plot(sim_7, "Scenario 7")
 plot_8<-generate_plot(sim_8, "Scenario 8")
+plot_9<-generate_plot(sim_9, "Scenario 9")
+plot_10<-generate_plot(sim_10, "Scenario 10")
 
 
 
@@ -128,13 +150,10 @@ plot_8<-generate_plot(sim_8, "Scenario 8")
 grid.arrange(plot_1, plot_2, nrow = 1)
 grid.arrange(plot_3, plot_4, nrow = 1)
 grid.arrange(plot_1, plot_2, plot_3, plot_4, nrow = 2)
-print(plot_5)
-print(plot_6)
-print(plot_7)
-print(plot_8)
 
 
-grid.arrange(plot_3, plot_6, nrow = 1)
+grid.arrange(plot_5, plot_6, plot_7, nrow = 2)
+grid.arrange(plot_8, plot_9, plot_10, nrow = 2)
 
 ```
 
@@ -149,6 +168,11 @@ mean_pop4 <- aggregate(Pop_size ~ Time, sim_4, mean)
 mean_pop5 <- aggregate(Pop_size ~ Time, sim_5, mean)
 mean_pop6 <- aggregate(Pop_size ~ Time, sim_6, mean)
 
+mean_pop7 <- aggregate(Pop_size ~ Time, sim_7, mean)
+mean_pop8 <- aggregate(Pop_size ~ Time, sim_8, mean)
+mean_pop9 <- aggregate(Pop_size ~ Time, sim_9, mean)
+mean_pop10 <- aggregate(Pop_size ~ Time, sim_10, mean)
+
 # Calculate the standard deviation
 sd_pop1 <- aggregate(Pop_size ~ Time, sim_1, sd)
 sd_pop2 <- aggregate(Pop_size ~ Time, sim_2, sd)
@@ -156,6 +180,10 @@ sd_pop3 <- aggregate(Pop_size ~ Time, sim_3, sd)
 sd_pop4 <- aggregate(Pop_size ~ Time, sim_4, sd)
 sd_pop5 <- aggregate(Pop_size ~ Time, sim_5, sd)
 sd_pop6 <- aggregate(Pop_size ~ Time, sim_6, sd)
+sd_pop7 <- aggregate(Pop_size ~ Time, sim_7, sd)
+sd_pop8 <- aggregate(Pop_size ~ Time, sim_8, sd)
+sd_pop9 <- aggregate(Pop_size ~ Time, sim_9, sd)
+sd_pop10 <- aggregate(Pop_size ~ Time, sim_10, sd)
 
 # Combine the mean population sizes from all analyses into a single data frame
 combined_mean_pop <- rbind(mean_pop5, mean_pop6)
@@ -233,7 +261,7 @@ ggplot(data.frame(FinalPopulation = final_populations), aes(x = FinalPopulation)
 # Calculate the probability of extinction
 ```{r}
 # Determine the number of repetitions
-reps <- max(sim_1$rep)
+reps <- max(sim_8$rep)
 
 # Initialize a counter for extinction events
 extinction_count <- 0
@@ -241,7 +269,7 @@ extinction_count <- 0
 # Loop through each repetition
 for (i in 1:reps) {
   # Subset data for the current repetition
-  rep_data <- subset(sim_1, rep == i)
+  rep_data <- subset(sim_8, rep == i)
   
   # Check if the population size ever reaches zero
   if (any(rep_data$Pop_size == 0)) {
@@ -257,49 +285,6 @@ print(paste("Probability of extinction:", probability_extinction))
 
 
 ```
-```{r}
-# Analyses of crop type based simulations 
 
-data_crops <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/croptypes_4x1_4x2_2x3_100it_30startN_simulation2.csv", header=TRUE,sep=",")
-
-library(ggplot2)
-library(gridExtra)
-
-generate_plot <- function(data, plot_title) {
-  ggplot(data, aes(x = Time, y = Pop_size, group = rep)) +
-    geom_line(color = "lightgrey") + #plot all iterations as grey lines 
-    stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", linewidth = 1) + #plot the mean as a dark/black line
-    labs(x = "Time", y = "Population Size", title = plot_title) #add labels and titles
-} 
-
-plot_crops<-generate_plot(data_crops, "N30, 2 type 3, 4 type 1 and 2")
-
-print(plot_crops)
-
-# extinction probability 
-reps <- max(data_crops$rep)
-
-# Initialize a counter for extinction events
-extinction_count <- 0
-
-# Loop through each repetition
-for (i in 1:reps) {
-  # Subset data for the current repetition
-  rep_data <- subset(data_crops, rep == i)
-  
-  # Check if the population size ever reaches zero
-  if (any(rep_data$Pop_size == 0)) {
-    extinction_count <- extinction_count + 1
-  }
-}
-
-# Calculate the probability of extinction
-probability_extinction <- extinction_count / reps
-
-# Print the result
-print(paste("Probability of extinction:", probability_extinction))
-
-
-```
 
 

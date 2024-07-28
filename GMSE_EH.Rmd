@@ -169,14 +169,14 @@ crop_hamster <- function(land, res){
         yloc <- res[i, 6] +1;
         crop <- land[xloc, yloc, 1];
         
-        #cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, this shows that some hamsters' xloc or yloc randomly seems to change by 1 cell between simulations, even when movement is not simulated, sometimes both change, sometimes just one changes, and sometimes the crop type value (1, 2 or 3) also changes
+        # cat("Hamster ", i, " at (", xloc, ", ", yloc, ") has crop type: ", crop, "\n") #added this bit to check if the function is working properly, this shows that some hamsters' xloc or yloc randomly seems to change by 1 cell between simulations, even when movement is not simulated, sometimes both change, sometimes just one changes, and sometimes the crop type value (1, 2 or 3) also changes
       
           if (crop == 1) {
           res[i, 9] <- 1  # column 9 = death probability -> 100% mortality
         #} else if (crop == 2 && next_time %in% c(AUG,SEP)) {
           #res[i, 9] <- res[i, 9] + 0.05  # increase mortality by 5% in months after harvest 
         } else if (crop == 3 && next_time %in% c(JUN, JUL, AUG)) { 
-          res[i, 10] <- 1.46
+          res[i, 10] <- 3
         } else {
           # Default case, nothing changes
       }
@@ -621,7 +621,7 @@ timestamp <- format(Sys.time(), "%Y%m%d-%H%M%S")
 
 # Crop type plot
 # Adjust plot margins to make space for the legend
-output_folder<- "C:/Users/imket/Documents/UAntwerpen/Master thesis/Figures/Landscape simulations/Simulation 9"
+output_folder<- "C:/Users/imket/Documents/UAntwerpen/Master thesis/Figures/Landscape simulations/Simulation 10"
 filename_crop <- file.path(output_folder, paste0(timestamp, ".png"))
 png(filename_crop, width = 1000, height = 800)
 par(mar = c(5, 4, 4, 8) + 0.1)
@@ -658,7 +658,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation9_100it_250startN.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation10_100it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
