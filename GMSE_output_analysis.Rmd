@@ -82,7 +82,7 @@ new_rows <- sim_7 %>%
 # Bind the new rows to the original data
 sim_7 <- bind_rows(sim_7, new_rows)
 
-sim_8 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation8_4x1_4x2_2x3_100it_250startN.csv", header=TRUE,sep=",")
+sim_8 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation8_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_8 %>%
   group_by(rep) %>%
@@ -112,6 +112,25 @@ new_rows <- sim_10 %>%
 # Bind the new rows to the original data
 sim_10 <- bind_rows(sim_10, new_rows)
 
+sim_11 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation11_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_11 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_11 <- bind_rows(sim_11, new_rows)
+
+sim_12 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation12_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_12 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_12 <- bind_rows(sim_12, new_rows)
 
 
 ```
@@ -142,6 +161,9 @@ plot_7<-generate_plot(sim_7, "Scenario 7")
 plot_8<-generate_plot(sim_8, "Scenario 8")
 plot_9<-generate_plot(sim_9, "Scenario 9")
 plot_10<-generate_plot(sim_10, "Scenario 10")
+plot_11<-generate_plot(sim_11, "Scenario 11")
+plot_12<-generate_plot(sim_12, "Scenario 12")
+
 
 
 
@@ -152,8 +174,11 @@ grid.arrange(plot_3, plot_4, nrow = 1)
 grid.arrange(plot_1, plot_2, plot_3, plot_4, nrow = 2)
 
 
-grid.arrange(plot_5, plot_6, plot_7, nrow = 2)
-grid.arrange(plot_8, plot_9, plot_10, nrow = 2)
+grid.arrange(plot_5, plot_6, plot_7,plot_8, nrow = 2)
+grid.arrange(plot_9, plot_10, plot_11,plot_12, nrow = 2)
+
+print(plot_11)
+print(plot_12)
 
 ```
 
@@ -173,6 +198,10 @@ mean_pop8 <- aggregate(Pop_size ~ Time, sim_8, mean)
 mean_pop9 <- aggregate(Pop_size ~ Time, sim_9, mean)
 mean_pop10 <- aggregate(Pop_size ~ Time, sim_10, mean)
 
+
+mean_pop11 <- aggregate(Pop_size ~ Time, sim_11, mean)
+mean_pop12 <- aggregate(Pop_size ~ Time, sim_12, mean)
+
 # Calculate the standard deviation
 sd_pop1 <- aggregate(Pop_size ~ Time, sim_1, sd)
 sd_pop2 <- aggregate(Pop_size ~ Time, sim_2, sd)
@@ -184,6 +213,8 @@ sd_pop7 <- aggregate(Pop_size ~ Time, sim_7, sd)
 sd_pop8 <- aggregate(Pop_size ~ Time, sim_8, sd)
 sd_pop9 <- aggregate(Pop_size ~ Time, sim_9, sd)
 sd_pop10 <- aggregate(Pop_size ~ Time, sim_10, sd)
+sd_pop11 <- aggregate(Pop_size ~ Time, sim_11, sd)
+sd_pop12 <- aggregate(Pop_size ~ Time, sim_12, sd)
 
 # Combine the mean population sizes from all analyses into a single data frame
 combined_mean_pop <- rbind(mean_pop5, mean_pop6)
