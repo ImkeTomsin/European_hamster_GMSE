@@ -132,6 +132,15 @@ new_rows <- sim_12 %>%
 # Bind the new rows to the original data
 sim_12 <- bind_rows(sim_12, new_rows)
 
+sim_13 <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 13/Simulation13_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_13 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_13 <- bind_rows(sim_13, new_rows)
 
 ```
 
@@ -164,6 +173,8 @@ plot_10<-generate_plot(sim_10, "Scenario 10")
 plot_11<-generate_plot(sim_11, "Scenario 11")
 plot_12<-generate_plot(sim_12, "Scenario 12")
 
+plot_13<-generate_plot(sim_13,"Scenario 13")
+
 
 
 
@@ -179,6 +190,7 @@ grid.arrange(plot_9, plot_10, plot_11,plot_12, nrow = 2)
 
 print(plot_11)
 print(plot_12)
+print(plot_13)
 
 ```
 
