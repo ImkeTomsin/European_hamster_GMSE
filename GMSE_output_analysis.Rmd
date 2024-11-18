@@ -6,6 +6,8 @@ output: html_document
 ---
 # Load data to be analysed 
 ```{r}
+library(dplyr)
+
 sim_1 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation1_100it_15startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 library(dplyr)
@@ -132,6 +134,7 @@ new_rows <- sim_12 %>%
 # Bind the new rows to the original data
 sim_12 <- bind_rows(sim_12, new_rows)
 
+
 sim_13 <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 13/Simulation13_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_13 %>%
@@ -142,6 +145,26 @@ new_rows <- sim_13 %>%
 # Bind the new rows to the original data
 sim_13 <- bind_rows(sim_13, new_rows)
 
+
+sim_14 <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 14/Simulation14_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_14 %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_14 <- bind_rows(sim_14, new_rows)
+
+sim_12b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 12b/Simulation12b_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_12b %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_12b <- bind_rows(sim_12b, new_rows)
 ```
 
 # Plot all simulations on one graph + their mean
@@ -174,7 +197,9 @@ plot_11<-generate_plot(sim_11, "Scenario 11")
 plot_12<-generate_plot(sim_12, "Scenario 12")
 
 plot_13<-generate_plot(sim_13,"Scenario 13")
+plot_14<-generate_plot(sim_14,"Scenario 14")
 
+plot_12b<-generate_plot(sim_12b,"Scenario 12b")
 
 
 
@@ -191,6 +216,8 @@ grid.arrange(plot_9, plot_10, plot_11,plot_12, nrow = 2)
 print(plot_11)
 print(plot_12)
 print(plot_13)
+print(plot_14)
+print(plot_12b)
 
 ```
 
