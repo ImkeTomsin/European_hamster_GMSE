@@ -134,15 +134,13 @@ new_rows <- sim_12 %>%
 # Bind the new rows to the original data
 sim_12 <- bind_rows(sim_12, new_rows)
 
-sim_9b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 9b/Simulation9b_100it_250startN.csv", header=TRUE,sep=",")
+sim_11b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 11b/Simulation11b_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
-new_rows <- sim_9b %>%
-  group_by(rep) %>%
+new_rows <- sim_11b %>%
   slice(1) %>%
-  mutate(Time = 0, Pop_size = 250) %>%
-  select(rep, Time, Pop_size)
+  mutate(Time = 0, Pop_size = 250)
 # Bind the new rows to the original data
-sim_9b <- bind_rows(sim_9b, new_rows)
+sim_11b <- bind_rows(sim_11b, new_rows)
 
 sim_12b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 12b/Simulation12b_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
@@ -184,11 +182,12 @@ plot_10<-generate_plot(sim_10, "Scenario 10")
 plot_11<-generate_plot(sim_11, "Scenario 11")
 plot_12<-generate_plot(sim_12, "Scenario 12")
 
-plot_9b<-generate_plot(sim_9b, "Scenario 9b")
-
 plot_12b<-generate_plot(sim_12b,"Scenario 12b")
 
-
+#test for single iteration
+plot_11b <- ggplot(sim_11b, aes(x= Time, y = Pop_size))+
+    theme_minimal()+
+    geom_line(color = "darkgrey")
 
 # print(plot_1)
 
@@ -203,7 +202,7 @@ grid.arrange(plot_9, plot_10, plot_11,plot_12, nrow = 2)
 print(plot_11)
 print(plot_12)
 
-print(plot_9b)
+print(plot_11b)
 print(plot_12b)
 
 ```
