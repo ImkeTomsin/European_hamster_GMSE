@@ -173,33 +173,8 @@ crop_hamster <- function(land, res){
           res[i, 9] <- 1  # column 9 = death probability -> 100% mortality
         #} else if (crop == 2 && next_time %in% c(AUG,SEP)) {
           #res[i, 9] <- res[i, 9] + 0.05  # increase mortality by 5% in months after harvest 
-        } else if (crop == 3 && next_time %in% c(JAN)) { 
-          res[i, 9] <- 1-0.966
-        } else if (crop == 3 && next_time %in% c(FEB)) { 
-          res[i, 9] <- 1-0.96
-        } else if (crop == 3 && next_time %in% c(MAR)) { 
-          res[i, 9] <- 1-0.919
-        } else if (crop == 3 && next_time %in% c(APR)) { 
-          res[i, 9] <- 1-0.953
-        } else if (crop == 3 && next_time %in% c(MAY)) { 
-          res[i, 9] <- 1-0.859
-        } else if (crop == 3 && next_time %in% c(JUN)) { 
-          res[i, 10] <- 1.28
-          res[i, 9] <- 1-0.827
-        } else if (crop == 3 && next_time %in% c(JUL)) { 
-          res[i, 10] <- 1.28
-          res[i, 9] <- 1-0.839
-        } else if (crop == 3 && next_time %in% c(AUG)) { 
-          res[i, 10] <- 1.28
-          res[i, 9] <- 1-0.838
-        } else if (crop == 3 && next_time %in% c(SEP)) { 
-          res[i, 9] <- 1-0.91
-        } else if (crop == 3 && next_time %in% c(OCT)) { 
-          res[i, 9] <- 1-0.897
-        } else if (crop == 3 && next_time %in% c(NOV)) { 
-          res[i, 9] <- 1-0.923
-        } else if (crop == 3 && next_time %in% c(DEC)) { 
-          res[i, 9] <- 1-0.972
+        } else if (crop == 3 && next_time %in% c(JUN, JUL, AUG)) { 
+          res[i, 10] <- 1.46
         } else {
           # Default case, nothing changes
       }
@@ -703,15 +678,15 @@ for (rep in 1:iterations) {
   tryCatch({
     
 ################################### Adding the landscape function here = different landscape for each iteration   
-crop_type2 <- function(land, agents = 11) { # agents = 1 (manager) + number of stakeholders
+crop_type2 <- function(land, agents = 101) { # agents = 1 (manager) + number of stakeholders
   xdim <- dim(land)[1]
   ydim <- dim(land)[2]
   
   # Randomly assign stakeholders to crop types
   stakeholders_vector <- sample(2:agents) #randomly shuffle the stakeholders (agents), but leave out the first (= always the manager)
-  type3_stakeholders <- stakeholders_vector[1:2] #2 get type 3
-  type2_stakeholders <- stakeholders_vector[3:6] #4 get type 2
-  type1_stakeholders <- stakeholders_vector[7:10] #4 get type 1
+  type3_stakeholders <- stakeholders_vector[1:20] #2 get type 3
+  type2_stakeholders <- stakeholders_vector[21:60] #4 get type 2
+  type1_stakeholders <- stakeholders_vector[61:100] #4 get type 1
   
   # Create a vector to store the crop type for each stakeholder
   stakeholder_types <- rep(NA, agents)
@@ -738,7 +713,7 @@ crop_type2 <- function(land, agents = 11) { # agents = 1 (manager) + number of s
 #####################################################
 
 # Initialise the first output
-sim_old   <- gmse_apply(stakeholders    = 10, 
+sim_old   <- gmse_apply(stakeholders    = 100, 
                         res_movement    = 100, 
                         res_move_type   = 0,
                         remove_pr       = 1 - 0.976083968, 
@@ -937,7 +912,7 @@ timestamp <- format(Sys.time(), "%Y%m%d-%H%M%S")
 
 # Crop type plot
 # Adjust plot margins to make space for the legend
-output_folder<- "C:/Users/lucp13135/Documents/Simulations/Simulation 12b"
+output_folder<- "C:/Users/lucp13135/Documents/Simulations/Simulation 10b"
 filename_crop <- file.path(output_folder, paste0(timestamp, ".png"))
 png(filename_crop, width = 1000, height = 800)
 par(mar = c(5, 4, 4, 8) + 0.1)
@@ -973,7 +948,7 @@ for (rep_id in unique(combined_results$rep)) {
   combined_results[combined_results$rep == rep_id, ] <- rep_data
 }
 
-file_path <- "C:/Users/lucp13135/Documents/Simulations/Simulation 12b/Simulation12b_100it_250startN.csv" #Give the simulation an appropriate name
+file_path <- "C:/Users/lucp13135/Documents/Simulations/Simulation 10b/Simulation10b_100it_250startN.csv" #Give the simulation an appropriate name
 write.csv(combined_results, file = file_path, row.names = FALSE)
 
 ```
