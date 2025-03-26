@@ -8,7 +8,7 @@ output: html_document
 ```{r}
 library(dplyr)
 
-sim_1 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation1_100it_15startN.csv", header=TRUE,sep=",")
+sim_1 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/Simulation1_100it_15startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 library(dplyr)
 new_rows <- sim_1 %>%
@@ -20,7 +20,7 @@ new_rows <- sim_1 %>%
 sim_1 <- bind_rows(sim_1, new_rows)
 
 
-sim_2 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation2_1000it_15startN.csv", header=TRUE,sep=",")
+sim_2 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/Simulation2_1000it_15startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_2 %>%
   group_by(rep) %>%
@@ -31,7 +31,7 @@ new_rows <- sim_2 %>%
 sim_2 <- bind_rows(sim_2, new_rows)
 
 
-sim_3 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation3_100it_250startN.csv", header=TRUE,sep=",")
+sim_3 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/Simulation3_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_3 %>%
   group_by(rep) %>%
@@ -42,7 +42,7 @@ new_rows <- sim_3 %>%
 sim_3 <- bind_rows(sim_3, new_rows)
 
 
-sim_4 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation4_1000it_250startN.csv", header=TRUE,sep=",")
+sim_4 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/Simulation4_1000it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_4 %>%
   group_by(rep) %>%
@@ -53,7 +53,7 @@ new_rows <- sim_4 %>%
 sim_4 <- bind_rows(sim_4, new_rows)
 
 
-sim_5 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/Simulation5_100it_250startN.csv", header=TRUE,sep=",")
+sim_5 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/Simulation5_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_5 %>%
   group_by(rep) %>%
@@ -64,7 +64,7 @@ new_rows <- sim_5 %>%
 sim_5 <- bind_rows(sim_5, new_rows)
 
 
-sim_6 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation6_100it_250startN.csv", header=TRUE,sep=",")
+sim_6 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation6_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_6 %>%
   group_by(rep) %>%
@@ -74,7 +74,7 @@ new_rows <- sim_6 %>%
 # Bind the new rows to the original data
 sim_6 <- bind_rows(sim_6, new_rows)
 
-sim_7 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation7_100it_250startN.csv", header=TRUE,sep=",")
+sim_7 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation7_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_7 %>%
   group_by(rep) %>%
@@ -84,7 +84,7 @@ new_rows <- sim_7 %>%
 # Bind the new rows to the original data
 sim_7 <- bind_rows(sim_7, new_rows)
 
-sim_8 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation8_100it_250startN.csv", header=TRUE,sep=",")
+sim_8 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation8_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_8 %>%
   group_by(rep) %>%
@@ -94,7 +94,7 @@ new_rows <- sim_8 %>%
 # Bind the new rows to the original data
 sim_8 <- bind_rows(sim_8, new_rows)
 
-sim_9 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation9_100it_250startN.csv", header=TRUE,sep=",")
+sim_9 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation9_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_9 %>%
   group_by(rep) %>%
@@ -104,7 +104,7 @@ new_rows <- sim_9 %>%
 # Bind the new rows to the original data
 sim_9 <- bind_rows(sim_9, new_rows)
 
-sim_10 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation10_100it_250startN.csv", header=TRUE,sep=",")
+sim_10 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation10_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_10 %>%
   group_by(rep) %>%
@@ -114,7 +114,7 @@ new_rows <- sim_10 %>%
 # Bind the new rows to the original data
 sim_10 <- bind_rows(sim_10, new_rows)
 
-sim_11 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation11_100it_250startN.csv", header=TRUE,sep=",")
+sim_11 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation11_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_11 %>%
   group_by(rep) %>%
@@ -124,7 +124,7 @@ new_rows <- sim_11 %>%
 # Bind the new rows to the original data
 sim_11 <- bind_rows(sim_11, new_rows)
 
-sim_12 <- read.csv("C:/Users/imket/Documents/GitHub/European_hamster_GMSE/Output/simulation12_100it_250startN.csv", header=TRUE,sep=",")
+sim_12 <- read.csv("C:/Users/lucp13135/Documents/GitHub/European_hamster_GMSE/Output/simulation12_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
 new_rows <- sim_12 %>%
   group_by(rep) %>%
@@ -133,6 +133,24 @@ new_rows <- sim_12 %>%
   select(rep, Time, Pop_size)
 # Bind the new rows to the original data
 sim_12 <- bind_rows(sim_12, new_rows)
+
+sim_9b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 9b/Simulation9b_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_9b %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250)
+# Bind the new rows to the original data
+sim_9b <- bind_rows(sim_9b, new_rows)
+
+sim_10b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 10b/Simulation10b_100it_250startN.csv", header=TRUE,sep=",")
+#Add starting population size (time = 0, N = 15 or 250) to each iteration
+new_rows <- sim_10b %>%
+  group_by(rep) %>%
+  slice(1) %>%
+  mutate(Time = 0, Pop_size = 250) %>%
+  select(rep, Time, Pop_size)
+# Bind the new rows to the original data
+sim_10b <- bind_rows(sim_10b, new_rows)
 
 sim_11b <- read.csv("C:/Users/lucp13135/Documents/Simulations/Simulation 11b/Simulation11b_100it_250startN.csv", header=TRUE,sep=",")
 #Add starting population size (time = 0, N = 15 or 250) to each iteration
@@ -164,7 +182,7 @@ generate_plot <- function(data, plot_title) {
     theme_minimal()+
     geom_line(color = "lightgrey") + #plot all iterations as grey lines 
     stat_summary(fun = "mean", geom = "line", aes(group = 1), color = "black", linewidth = 0.82) + #plot the mean as a dark/black line
-    labs(x = "Time", y = "Population Size", title = plot_title)+ #add labels and titles
+    labs(x = "Time step", y = "Population Size", title = plot_title)+ #add labels and titles
     scale_x_continuous(expand = c(0, 0), limits = c(0, 60))+  # Ensure x-axis starts at 0 and stops at 60
     scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) # Same for y-axis
 } 
@@ -182,28 +200,23 @@ plot_10<-generate_plot(sim_10, "Scenario 10")
 plot_11<-generate_plot(sim_11, "Scenario 11")
 plot_12<-generate_plot(sim_12, "Scenario 12")
 
-plot_12b<-generate_plot(sim_12b,"Scenario 12b")
+plot_9b<-generate_plot(sim_9b,"Scenario 13")
+plot_10b<-generate_plot(sim_10b,"Scenario 14")
+plot_11b<-generate_plot(sim_11b,"Scenario 15")
+plot_12b<-generate_plot(sim_12b,"Scenario 16")
 
-#test for single iteration
-plot_11b <- ggplot(sim_11b, aes(x= Time, y = Pop_size))+
-    theme_minimal()+
-    geom_line(color = "darkgrey")
+
 
 # print(plot_1)
 
-grid.arrange(plot_1, plot_2, nrow = 1)
-grid.arrange(plot_3, plot_4, nrow = 1)
+
 grid.arrange(plot_1, plot_2, plot_3, plot_4, nrow = 2)
 
 
 grid.arrange(plot_5, plot_6, plot_7,plot_8, nrow = 2)
 grid.arrange(plot_9, plot_10, plot_11,plot_12, nrow = 2)
 
-print(plot_11)
-print(plot_12)
-
-print(plot_11b)
-print(plot_12b)
+grid.arrange(plot_9b, plot_10b, plot_11b,plot_12b, nrow = 2)
 
 ```
 
@@ -226,6 +239,8 @@ mean_pop11 <- aggregate(Pop_size ~ Time, sim_11, mean)
 mean_pop12 <- aggregate(Pop_size ~ Time, sim_12, mean)
 
 mean_pop9b <- aggregate (Pop_size ~ Time, sim_9b, mean)
+mean_pop10b <- aggregate (Pop_size ~ Time, sim_10b, mean)
+mean_pop11b <- aggregate (Pop_size ~ Time, sim_11b, mean)
 mean_pop12b <- aggregate (Pop_size ~ Time, sim_12b, mean)
 
 # Calculate the standard deviation
@@ -243,6 +258,11 @@ sd_pop11 <- aggregate(Pop_size ~ Time, sim_11, sd)
 sd_pop12 <- aggregate(Pop_size ~ Time, sim_12, sd)
 
 
+sd_pop9b <- aggregate(Pop_size ~ Time, sim_9b, sd)
+sd_pop10b <- aggregate(Pop_size ~ Time, sim_10b, sd)
+sd_pop11b <- aggregate(Pop_size ~ Time, sim_11b, sd)
+sd_pop12b <- aggregate(Pop_size ~ Time, sim_12b, sd)
+
 sd_pop12b <- aggregate(Pop_size ~ Time, sim_12b, sd)
 
 # Combine the mean population sizes from all analyses into a single data frame
@@ -253,7 +273,7 @@ combined_mean_pop$Analysis <- rep(c("Scenario 5", "Scenario 6"), each = nrow(mea
 ggplot(combined_mean_pop, aes(x = Time, y = Pop_size, color = Analysis)) +
   geom_line() +
   theme_minimal()+
-  labs(x = "Time", y = "Mean Population Size")+
+  labs(x = "Time step", y = "Mean Population Size")+
   scale_x_continuous(expand = c(0, 0), limits = c(0, 60))+  # Ensure x-axis starts at 0 and stops at 60
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA)) # Same for y-axis
 
@@ -269,7 +289,7 @@ custom_colors <- c( "#D0832E", "#EBD657", "#2FABAB", "#92C37F")  # Adjust colors
 ggplot(combined_mean_pop2, aes(x = Time, y = Pop_size, color = Analysis)) +
   geom_line(linewidth=0.7) +
   theme_minimal()+
-  labs(x = "Time", y = "Mean Population Size")+
+  labs(x = "Time step", y = "Mean Population Size")+
   scale_x_continuous(expand = c(0, 0), limits = c(0, 60))+  # Ensure x-axis starts at 0 and stops at 60
   scale_y_continuous(expand = c(0, 0), limits = c(0, NA))+ # Same for y-axis
   scale_color_manual(values = custom_colors) +  # Apply custom colors
